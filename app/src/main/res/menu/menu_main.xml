@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
+      <!-- Settings, should always be in the overflow
+           but... I'm an ass, so am taking my own twist.
+           You can't tell me what do do, Google! -->
+      <item android:id="@+id/action_settings"
+            android:icon="@drawable/ic_settings_white_24dp"
+            android:title="@string/action_settings"
+            app:showAsAction="always" />
+</menu>

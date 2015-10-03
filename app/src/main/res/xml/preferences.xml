@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="general_options"
+        android:title="@string/pref_title_general">
+        <ListPreference
+            android:key="@string/key_pref_sensitivity"
+            android:title="@string/pref_sensitivity"
+            android:dialogTitle="@string/pref_sensitivity"
+            android:summary="@string/pref_sensitivity_summ"
+            android:entries="@array/pref_sensitivity_entries"
+            android:entryValues="@array/pref_sensitivity_values"
+            android:defaultValue="@string/pref_sensitivity_default_value" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="dev_options"
+        android:title="@string/pref_title_dev">
+        <CheckBoxPreference
+            android:key="pref_debug"
+            android:title="@string/pref_debug"
+            android:summary="@string/pref_debug_summ"
+            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:key="pref_debug_buttons"
+            android:title="@string/pref_debug_buttons"
+            android:summary="@string/pref_debug_buttons_summ"
+            android:defaultValue="false"
+            android:dependency="@string/key_pref_debug"/>
+    </PreferenceCategory>
+</PreferenceScreen>

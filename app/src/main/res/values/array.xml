@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sensitivity_entries">
+        <item>Slow</item>
+        <item>Default</item>
+        <item>Fast</item>
+    </string-array>
+    <string-array name="pref_sensitivity_values">
+        <item>0.25</item>
+        <item>1</item>
+        <item>4</item>
+    </string-array>
+    <string-array name="level_names">
+        <item>@string/level_random</item>
+        <item>@string/level_bugged</item>
+    </string-array>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Basic Material colour palette https://www.google.com/design/spec/style/color.html#color-color-palette -->
+    <!-- Primary -->
+    <color name="blue_primary">#0277BD</color>
+    <color name="green_primary">#689F38</color>
+    <color name="teal_primary">#009688</color>
+
+    <!-- Primary Dark -->
+    <color name="blue_primary_dark">#015F97</color>
+    <color name="green_primary_dark">#558B2F</color>
+    <color name="teal_primary_dark">#00897B</color>
+
+    <!-- Accent -->
+    <color name="teal_accent">#009688</color>
+    <color name="pink_accent">#D04D9F</color>
+    <color name="orange_accent">#EF6C00</color>
+    <color name="yellow_accent">#FFC400</color>
+
+    <!-- Misc. -->
+    <color name="light_bg">#F0F0F0</color>
+    <color name="white">#FDFDFD</color>
+
+    <!-- Sneaky Area
+         It's a little annoying to set colors of individual views,
+         So these variables are used for those -->
+    <color name="main_accent">@color/teal_accent</color>
+</resources>

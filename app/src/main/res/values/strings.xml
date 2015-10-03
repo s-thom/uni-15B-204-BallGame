@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Ball Game</string>
+    <string name="creators">Stuart Thomson (swdt1) and Tim Hampton (tmh31)</string>
+    <string name="score_label">Current Score: </string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_game">Play!</string>
+    <string name="title_activity_preferences">Preferences</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_activity_game">Ball Game</string>
+    <string name="game_default_level_name">{LEVEL}</string>
+
+    <string name="pref_title_general">General Options</string>
+
+    <string name="pref_sensitivity">Sensitivity</string>
+    <string name="pref_sensitivity_summ">Sets how sensitive the sensor is</string>
+    <string name="pref_sensitivity_slow">Slow</string>
+    <string name="pref_sensitivity_def">Default</string>
+    <string name="pref_sensitivity_fast">Fast</string>
+    <string name="pref_sensitivity_default_value">1</string>
+
+    <string name="pref_title_dev">Developer Options</string>
+
+    <string name="pref_debug">Debug Info</string>
+    <string name="pref_debug_summ">Shows debug information in Game Activity</string>
+    <string name="pref_debug_buttons">Use button control</string>
+    <string name="pref_debug_buttons_summ">Disables accelerometer</string>
+
+    <string name="key_pref_sensitivity">pref_sensitivity</string>
+    <string name="key_pref_debug">pref_debug</string>
+    <string name="key_pref_debug_buttons">pref_debug_buttons</string>
+
+
+    <string name="level_select">Select Level:</string>
+    <string name="level_random">Random</string>
+    <string name="level_bugged">Bugged</string>
+</resources>
