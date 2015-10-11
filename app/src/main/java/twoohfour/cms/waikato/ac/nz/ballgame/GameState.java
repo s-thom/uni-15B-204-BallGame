@@ -307,6 +307,17 @@ public class GameState {
         } else if (l == Level.Scrolling) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
 
+            FinishSprite fs = new FinishSprite(10, 0, 1, 5);
+            sprites.add(fs);
+
+            sprites.add(new WallSprite(3, 0, 4, 1));
+            sprites.add(new WallSprite(3, 2, 1, 3));
+            sprites.add(new WallSprite(5, 1, 2, 2));
+            sprites.add(new WallSprite(5, 4, 1, 1));
+            sprites.add(new WallSprite(7, 3, 1, 1));
+            sprites.add(new WallSprite(8, 1, 2, 1));
+            sprites.add(new WallSprite(9, 2, 1, 3));
+
             DeathSprite ds = new DeathSprite(-0.75f, 0, 1, 5);
             ds.setMotion(0.01f, 0);
             sprites.add(ds);
@@ -314,9 +325,6 @@ public class GameState {
             StickyWallSprite sws = new StickyWallSprite(4.75f, 0, 1, 5);
             sws.setMotion(0.01f, 0f);
             sprites.add(sws);
-
-            FinishSprite fs = new FinishSprite(10, 0, 1, 5);
-            sprites.add(fs);
 
             sprites.add(new WallSprite(0, -1, 10, 1));
             sprites.add(new WallSprite(0, 5, 10, 1));
