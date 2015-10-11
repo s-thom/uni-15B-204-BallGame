@@ -53,11 +53,7 @@ public class DrawableView extends View {
     protected void onDraw(Canvas canvas) {
         if (_state != null) {
             if (_state.isReady()) {
-                // Draw all sprites
-                _state.getPlayer().draw(canvas, _viewStateRatio);
-                for (GenericSprite s : _state.getSprites()) {
-                    s.draw(canvas, _viewStateRatio);
-                }
+                _state.draw(canvas, _viewStateRatio);
                 invalidate(); // Add another draw routine to the event stack
             }
 

@@ -11,7 +11,7 @@ import android.graphics.RectF;
  */
 public class WallSprite extends GenericSprite implements IBouncable {
 
-
+    protected Paint _border = new Paint();
 
     /**
      * Construct the wall obsticals
@@ -20,9 +20,11 @@ public class WallSprite extends GenericSprite implements IBouncable {
      * @param width Width of my Wall
      * @param height Height of Wall
      */
-    public WallSprite(int leftPos, int topPos, int width, int height) {
+    public WallSprite(float leftPos, float topPos, float width, float height) {
         super(leftPos, topPos, width, height);
-        _paint.setColor(Color.MAGENTA);
+        _paint.setColor(Color.DKGRAY);
+        _border.setStyle(Paint.Style.STROKE);
+        _border.setColor(Color.BLACK);
 
     }
 
@@ -33,17 +35,12 @@ public class WallSprite extends GenericSprite implements IBouncable {
      * @param scale Scale at which to draw
      */
     @Override
-    public void draw(Canvas canvas, float scale) {
-        RectF r = new RectF(_rect.left * scale, _rect.top * scale, _rect.right * scale, _rect.bottom * scale);
+    public void draw(Canvas canvas, float scale, PointF offset) {
+        RectF r = new RectF((_rect.left + offset.x) * scale, (_rect.top + offset.y) * scale, (_rect.right + offset.x) * scale, (_rect.bottom + offset.y) * scale);
 
-        _paint.setStyle(Paint.Style.FILL);
-        _paint.setColor(Color.DKGRAY);
         canvas.drawRect(r, _paint);
-
         // border
-        _paint.setStyle(Paint.Style.STROKE);
-        _paint.setColor(Color.BLACK);
-        canvas.drawRect(r, _paint);
+        canvas.drawRect(r, _border);
 
     }
 
@@ -64,11 +61,17 @@ public class WallSprite extends GenericSprite implements IBouncable {
         RectF othrRect = sprite.getRectangle();
         PointF othrMotion = sprite.getMotion();
 
+        boolean bounceX = ((othrRect.right > _rect.left && othrRect.left < _rect.left &&  othrMotion.x > 0) || (othrRect.left < _rect.right && othrRect.right > _rect.right && othrMotion.x < 0));
+        boolean bounceY = ((othrRect.bottom > _rect.top && othrRect.top < _rect.top && othrMotion.y > 0) || (othrRect.top < _rect.bottom && othrRect.bottom > _rect.bottom && othrMotion.y < 0));
+
         // Each check here makes sure the player sprite is intersecting the right part of the given sprite
         // This is a heck of a lot easier than the previous way I was doing it.
-        if ((othrRect.bottom > _rect.top && othrRect.top < _rect.top && othrMotion.y > 0) || (othrRect.top < _rect.bottom && othrRect.bottom > _rect.bottom && othrMotion.y < 0))
+        if (bounceX && bounceY) {
+            othrMotion.y *= -0.5f * getBounciness();
+            othrMotion.x *= -0.5f * getBounciness();
+        } else if (bounceY)
             othrMotion.y *= -1 * getBounciness();
-        if ((othrRect.right > _rect.left && othrRect.left < _rect.left &&  othrMotion.x > 0) || (othrRect.left < _rect.right && othrRect.right > _rect.right && othrMotion.x < 0))
+        else if (bounceX)
             othrMotion.x *= -1 * getBounciness();
     }
 

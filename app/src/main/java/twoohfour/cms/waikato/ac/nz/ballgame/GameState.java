@@ -1,6 +1,7 @@
 package twoohfour.cms.waikato.ac.nz.ballgame;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -16,18 +17,19 @@ import java.util.Random;
 public class GameState {
 
     //region Variables
-    private float[] _grav;
-    private List<GenericSprite> _sprites;
-    private DrawableView _view;
-    private int[] _viewSize;
-    private Point _levelSize;
-    private int _score;
-    private PlayerSprite _player;
-    private String _title;
-    private int _ticks;
-    private boolean _isComplete;
+    protected float[] _grav;
+    protected List<GenericSprite> _sprites;
+    protected DrawableView _view;
+    protected int[] _viewSize;
+    protected Point _levelSize;
+    protected int _score;
+    protected PlayerSprite _player;
+    protected String _title;
+    protected int _ticks;
+    protected boolean _isComplete;
+    protected PointF _offset;
 
-    public enum Level { Random, Bugged }
+    public enum Level { Random, Scrolling }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -49,6 +51,7 @@ public class GameState {
         _player = new PlayerSprite(playerPosition.x, playerPosition.y);
         _sprites.add(_player);
         _title = title;
+        _offset = new PointF(0, 0);
     }
 
     //region Getters & Setters
@@ -220,7 +223,7 @@ public class GameState {
 
                 for (GenericSprite t : _sprites){
                     if (t != s) {
-                        if (t instanceof IBouncable && t.isCollidedWith(s) && !hasBounced) {
+                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s) && !hasBounced) {
 
                             ((IBouncable) t).bounceFrom(s);
 
@@ -230,6 +233,10 @@ public class GameState {
                                 _isComplete = true;
                                 addScore(1);
                             }
+                        } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
+                            if (t.isCollidedWith(s)) {
+                                _isComplete = true;
+                            }
                         }
                     }
                 }
@@ -238,6 +245,15 @@ public class GameState {
             for (GenericSprite s : _sprites) {
                 s.update(this);
             }
+        }
+    }
+
+    public void draw(Canvas canvas, float ratio) {
+
+        // Draw all sprites
+        _player.draw(canvas, ratio, _offset);
+        for (GenericSprite s : _sprites) {
+            s.draw(canvas, ratio, _offset);
         }
     }
 
@@ -288,10 +304,37 @@ public class GameState {
 
             GameState newLevel = new GameState(c.getString(R.string.level_random), new Point(levelX, levelY), new PointF(0, 0), sprites);
             return newLevel;
-        } else if (l == Level.Bugged) {
+        } else if (l == Level.Scrolling) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
-            sprites.add(new WallSprite(1, 1, 3, 3));
-            return new GameState(c.getString(R.string.level_bugged), new Point(5, 5), new PointF(2.5f, 2.5f), sprites);
+
+            FinishSprite fs = new FinishSprite(10, 0, 1, 5);
+            sprites.add(fs);
+
+            sprites.add(new WallSprite(3, 0, 4, 1));
+            sprites.add(new WallSprite(3, 2, 1, 3));
+            sprites.add(new WallSprite(5, 1, 2, 2));
+            sprites.add(new WallSprite(5, 4, 1, 1));
+            sprites.add(new WallSprite(7, 3, 1, 1));
+            sprites.add(new WallSprite(8, 1, 1, 1));
+            sprites.add(new WallSprite(9, 2, 1, 3));
+            sprites.add(new WallSprite(10, 0, 1, 1));
+            sprites.add(new WallSprite(10, 2, 1, 3));
+            sprites.add(new WallSprite(11, 0, 5, 5));
+
+            DeathSprite ds = new DeathSprite(-0.75f, 0, 1, 5);
+            ds.setMotion(0.01f, 0);
+            sprites.add(ds);
+
+            StickyWallSprite sws = new StickyWallSprite(4.75f, 0, 1, 5);
+            sws.setMotion(0.01f, 0f);
+            sprites.add(sws);
+
+            sprites.add(new WallSprite(0, -1, 10, 1));
+            sprites.add(new WallSprite(0, 5, 10, 1));
+
+            //sprites.add(new WallSprite(1, 1, 3, 3));
+
+            return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
         }
 
 
@@ -307,8 +350,8 @@ public class GameState {
         switch (name) {
             case "Random":
                 return Level.Random;
-            case "Bugged":
-                return Level.Bugged;
+            case "Scrolling":
+                return Level.Scrolling;
             default:
                 throw new IllegalArgumentException("Level not defined yet");
         }
