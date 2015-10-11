@@ -17,7 +17,7 @@ public class ScrollingGameState extends GameState {
      * Class used to pass values between drawing and updating classes
      */
     public ScrollingGameState(String title, Point levelSize, PointF playerPosition, float speed) {
-        this(title, levelSize, playerPosition, new ArrayList<GenericSprite>(), 0.01f);
+        this(title, levelSize, playerPosition, new ArrayList<GenericSprite>(), -0.01f);
     }
 
     /**
@@ -26,5 +26,11 @@ public class ScrollingGameState extends GameState {
     public ScrollingGameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites, float speed) {
         super(title, levelSize, playerPosition, sprites);
         _speed = speed;
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        _offset.x += _speed;
     }
 }
