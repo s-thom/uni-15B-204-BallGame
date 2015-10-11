@@ -278,7 +278,7 @@ public abstract class GenericSprite {
      * @param canvas Canvas to draw on
      * @param scale Scale at which to draw
      */
-    public abstract void draw(Canvas canvas, float scale);
+    public abstract void draw(Canvas canvas, float scale, PointF offset);
 
     /**
      * Update the sprite

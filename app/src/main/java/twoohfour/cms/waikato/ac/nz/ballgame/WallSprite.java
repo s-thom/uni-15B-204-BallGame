@@ -33,8 +33,8 @@ public class WallSprite extends GenericSprite implements IBouncable {
      * @param scale Scale at which to draw
      */
     @Override
-    public void draw(Canvas canvas, float scale) {
-        RectF r = new RectF(_rect.left * scale, _rect.top * scale, _rect.right * scale, _rect.bottom * scale);
+    public void draw(Canvas canvas, float scale, PointF offset) {
+        RectF r = new RectF((_rect.left + offset.x) * scale, (_rect.top + offset.y) * scale, (_rect.right + offset.x) * scale, (_rect.bottom + offset.y) * scale);
 
         _paint.setStyle(Paint.Style.FILL);
         _paint.setColor(Color.DKGRAY);

@@ -2,6 +2,7 @@ package twoohfour.cms.waikato.ac.nz.ballgame;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.graphics.RectF;
 
 /**
@@ -15,9 +16,9 @@ public class FinishSprite extends GenericSprite {
     }
 
     @Override
-    public void draw(Canvas canvas, float scale) {
+    public void draw(Canvas canvas, float scale, PointF offset) {
 
-        RectF r = new RectF(_rect.left * scale, _rect.top * scale, _rect.right * scale, _rect.bottom * scale);
+        RectF r = new RectF((_rect.left + offset.x) * scale, (_rect.top + offset.y) * scale, (_rect.right + offset.x) * scale, (_rect.bottom + offset.y) * scale);
         canvas.drawRect(r, _paint);
     }
 

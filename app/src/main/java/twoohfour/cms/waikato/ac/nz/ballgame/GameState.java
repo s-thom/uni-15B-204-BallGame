@@ -1,6 +1,7 @@
 package twoohfour.cms.waikato.ac.nz.ballgame;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -26,6 +27,7 @@ public class GameState {
     protected String _title;
     protected int _ticks;
     protected boolean _isComplete;
+    protected PointF _offset;
 
     public enum Level { Random, Bugged }
     //endregion
@@ -49,6 +51,7 @@ public class GameState {
         _player = new PlayerSprite(playerPosition.x, playerPosition.y);
         _sprites.add(_player);
         _title = title;
+        _offset = new PointF(0, 0);
     }
 
     //region Getters & Setters
@@ -238,6 +241,15 @@ public class GameState {
             for (GenericSprite s : _sprites) {
                 s.update(this);
             }
+        }
+    }
+
+    public void draw(Canvas canvas, float ratio) {
+
+        // Draw all sprites
+        _player.draw(canvas, ratio, _offset);
+        for (GenericSprite s : _sprites) {
+            s.draw(canvas, ratio, _offset);
         }
     }
 
