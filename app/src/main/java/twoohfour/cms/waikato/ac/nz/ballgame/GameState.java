@@ -223,7 +223,7 @@ public class GameState {
 
                 for (GenericSprite t : _sprites){
                     if (t != s) {
-                        if (t instanceof IBouncable && t.isCollidedWith(s) && !hasBounced) {
+                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s) && !hasBounced) {
 
                             ((IBouncable) t).bounceFrom(s);
 
@@ -307,12 +307,13 @@ public class GameState {
         } else if (l == Level.Scrolling) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
 
-            DeathSprite ds = new DeathSprite(0, 0, 1, 1);
+            DeathSprite ds = new DeathSprite(0, 0, 1, 5);
             ds.setMotion(0.01f, 0);
             sprites.add(ds);
 
             sprites.add(new WallSprite(1, 1, 3, 3));
-            return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites);
+            
+            return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
         }
 
 

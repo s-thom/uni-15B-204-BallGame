@@ -11,7 +11,7 @@ import android.util.Log;
 /**
  * Created by Stuart on 25/09/2015.
  */
-public class PlayerSprite extends GenericSprite {
+public class PlayerSprite extends GenericSprite implements ICollides {
 
     public PlayerSprite(float x, float y) {
         this(x, y, 1);
