@@ -16,16 +16,16 @@ import java.util.Random;
 public class GameState {
 
     //region Variables
-    private float[] _grav;
-    private List<GenericSprite> _sprites;
-    private DrawableView _view;
-    private int[] _viewSize;
-    private Point _levelSize;
-    private int _score;
-    private PlayerSprite _player;
-    private String _title;
-    private int _ticks;
-    private boolean _isComplete;
+    protected float[] _grav;
+    protected List<GenericSprite> _sprites;
+    protected DrawableView _view;
+    protected int[] _viewSize;
+    protected Point _levelSize;
+    protected int _score;
+    protected PlayerSprite _player;
+    protected String _title;
+    protected int _ticks;
+    protected boolean _isComplete;
 
     public enum Level { Random, Bugged }
     //endregion
