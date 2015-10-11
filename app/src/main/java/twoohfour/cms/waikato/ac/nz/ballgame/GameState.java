@@ -316,9 +316,9 @@ public class GameState {
             sprites.add(new WallSprite(5, 4, 1, 1));
             sprites.add(new WallSprite(7, 3, 1, 1));
             sprites.add(new WallSprite(8, 1, 1, 1));
-            sprites.add(new WallSprite(9, 3, 1, 2));
+            sprites.add(new WallSprite(9, 2, 1, 3));
             sprites.add(new WallSprite(10, 0, 1, 1));
-            sprites.add(new WallSprite(10, 3, 1, 2));
+            sprites.add(new WallSprite(10, 2, 1, 3));
             sprites.add(new WallSprite(11, 0, 5, 5));
 
             DeathSprite ds = new DeathSprite(-0.75f, 0, 1, 5);
