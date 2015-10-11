@@ -17,7 +17,7 @@ public class DeathSprite extends GenericSprite {
      * @param width Width of my Wall
      * @param height Height of Wall
      */
-    public DeathSprite(int leftPos, int topPos, int width, int height) {
+    public DeathSprite(float leftPos, float topPos, float width, float height) {
         super(leftPos, topPos, width, height);
         _paint.setColor(Color.RED);
     }
