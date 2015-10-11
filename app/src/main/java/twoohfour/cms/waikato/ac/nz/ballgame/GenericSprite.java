@@ -43,11 +43,11 @@ public abstract class GenericSprite {
     }
 
     public GenericSprite(float x, float y, float w, float h, float dx, float dy) {
-        this(x, y, w, h, dx, dy, 1);
+        this(x, y, w, h, dx, dy, 0);
     }
 
     public GenericSprite(float x, float y, float w, float h, float dx, float dy, float weight) {
-        this(x, y, w, h, dx, dy, weight, 1);
+        this(x, y, w, h, dx, dy, weight, 0);
     }
 
     public GenericSprite(float x, float y, float w, float h, float dx, float dy, float weight, float friction) {

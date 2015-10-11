@@ -11,7 +11,7 @@ import android.graphics.RectF;
  */
 public class WallSprite extends GenericSprite implements IBouncable {
 
-
+    protected Paint _border = new Paint();
 
     /**
      * Construct the wall obsticals
@@ -20,9 +20,11 @@ public class WallSprite extends GenericSprite implements IBouncable {
      * @param width Width of my Wall
      * @param height Height of Wall
      */
-    public WallSprite(int leftPos, int topPos, int width, int height) {
+    public WallSprite(float leftPos, float topPos, float width, float height) {
         super(leftPos, topPos, width, height);
-        _paint.setColor(Color.MAGENTA);
+        _paint.setColor(Color.DKGRAY);
+        _border.setStyle(Paint.Style.STROKE);
+        _border.setColor(Color.BLACK);
 
     }
 
@@ -36,14 +38,9 @@ public class WallSprite extends GenericSprite implements IBouncable {
     public void draw(Canvas canvas, float scale, PointF offset) {
         RectF r = new RectF((_rect.left + offset.x) * scale, (_rect.top + offset.y) * scale, (_rect.right + offset.x) * scale, (_rect.bottom + offset.y) * scale);
 
-        _paint.setStyle(Paint.Style.FILL);
-        _paint.setColor(Color.DKGRAY);
         canvas.drawRect(r, _paint);
-
         // border
-        _paint.setStyle(Paint.Style.STROKE);
-        _paint.setColor(Color.BLACK);
-        canvas.drawRect(r, _paint);
+        canvas.drawRect(r, _border);
 
     }
 

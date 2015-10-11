@@ -1,6 +1,8 @@
 package twoohfour.cms.waikato.ac.nz.ballgame;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PointF;
 
 /**
  * Created by Stuart on 11/10/2015.
@@ -14,9 +16,9 @@ public class StickyWallSprite extends WallSprite {
      * @param width Width of my Wall
      * @param height Height of Wall
      */
-    public StickyWallSprite(int leftPos, int topPos, int width, int height) {
+    public StickyWallSprite(float leftPos, float topPos, float width, float height) {
         super(leftPos, topPos, width, height);
-        _paint.setColor(Color.MAGENTA);
+        _border.setColor(Color.GREEN);
     }
 
     @Override

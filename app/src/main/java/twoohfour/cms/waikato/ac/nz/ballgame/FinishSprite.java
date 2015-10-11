@@ -15,6 +15,11 @@ public class FinishSprite extends GenericSprite {
         _paint.setColor(Color.rgb(35, 210, 75));
     }
 
+    public FinishSprite(float xPos, float yPos, float width, float height) {
+        super(xPos, yPos, width, height);
+        _paint.setColor(Color.rgb(35, 210, 75));
+    }
+
     @Override
     public void draw(Canvas canvas, float scale, PointF offset) {
 

@@ -311,8 +311,15 @@ public class GameState {
             ds.setMotion(0.01f, 0);
             sprites.add(ds);
 
+            StickyWallSprite sws = new StickyWallSprite(4.5f, 0, 1, 5);
+            sws.setMotion(0.01f, 0);
+            sprites.add(sws);
+
+            FinishSprite fs = new FinishSprite(10, 0, 1, 5);
+            sprites.add(fs);
+
             sprites.add(new WallSprite(1, 1, 3, 3));
-            
+
             return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
         }
 
