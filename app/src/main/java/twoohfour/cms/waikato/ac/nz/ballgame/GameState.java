@@ -27,7 +27,7 @@ public class GameState {
     private int _ticks;
     private boolean _isComplete;
 
-    public enum Level { Random, Bugged }
+    public enum Level { Random, Bugged, Empty }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -292,6 +292,9 @@ public class GameState {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
             sprites.add(new WallSprite(1, 1, 3, 3));
             return new GameState(c.getString(R.string.level_bugged), new Point(5, 5), new PointF(2.5f, 2.5f), sprites);
+        } else if (l == Level.Empty) {
+            return new GameState("", new Point(5,5), new PointF(2.5f, 2.5f));
+
         }
 
 
@@ -309,6 +312,8 @@ public class GameState {
                 return Level.Random;
             case "Bugged":
                 return Level.Bugged;
+            case "Empty":
+                return Level.Empty;
             default:
                 throw new IllegalArgumentException("Level not defined yet");
         }

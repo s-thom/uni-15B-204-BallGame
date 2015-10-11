@@ -24,12 +24,15 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class GameActivity extends AppCompatActivity implements SensorEventListener {
+public class GameActivity extends AppCompatActivity implements SensorEventListener, MultiplayerEventListener {
 
     //region Variables
     public static final String EXTRA_SCORE = "nz.ac.waikato.cms.twohofour.ballgame.SCORE";
@@ -50,6 +53,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private DrawableView _view;
     private GameState _state;
     private Timer _updateTimer;
+
+
+
+
+    private MultiplayerNetwork _network;
+    private InetAddress _server;
+    private boolean _iAmServer;
+    private final static int othersNetworkResponseTime = 200;
+    private String _myIP;
+    private InetAddress _myInet;
+
+    private int _timeToStart;
+    // Used to hold the level before it starts/cahnges
+    private String _level;
+
+    private Hashtable otherPlayers;
 
 
     //endregion
@@ -78,12 +97,64 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             Log.e("GameActivity", "Couldn't hide action bar");
         }
 
+
+
+
+
+
+
+
+
+        // Get my IP Address:
+        try {
+            _myIP = InetAddress.getLocalHost().getHostAddress();
+            _myInet = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            // TODO: Implement nicer error message
+            finish();
+        }
+
+        // Set the level to 0
+        _level = "";
+
+        // String is the ip
+        otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
+
+        _network = new MultiplayerNetwork();
+
+        _iAmServer = false;
+        _server = null;
+        // Establish who is server;
+        _network.sendCode(300, "");
+        try {
+            wait(othersNetworkResponseTime);
+        } catch (InterruptedException e) {
+            // Doesn't matter.
+            System.err.println("Didn't wait full time");
+        }
+
+        if (_server == null) {
+            _server = _myInet;
+            _iAmServer = true;
+            System.out.println("Starting me as server....");
+            _network.sendCode(301, "");
+            _network.sendCode(301, "");
+        }
+
+
+
+
+
+
+
         // Messy code to get a GameState.Level from an int passed through the intent system
-        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
-        if (levelNum == null)
-            levelNum = GameState.Level.Random;
-        // Save state
+        GameState.Level levelNum = GameState.Level.Empty;
         _state = GameState.GENERATE(levelNum, this);
+
+
+
+
+
 
         // Start update loop
         _updateTimer = new Timer("Update");
@@ -285,6 +356,127 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
+
+    @Override
+    public void onNetworkError(Exception e, String text) {
+        // Handle Errors
+        // TODO:  Implement nice error checking for various errors on Network.
+        System.err.println(e.getMessage() + " " + text);
+        finish();
+    }
+
+
+
+    @Override
+    public void message(int statusCode, String event, InetAddress from) {
+
+        /*
+
+
+        | Code                | Description                        |
+        |---------------------|------------------------------------|
+        | 300                 | Who is the server?                 |
+        | 301                 | I am the server                    |
+        | 100 <playername>    | Player ___ Joining Game            |
+        | 101 <ip>            | Player has been accepted into game |
+        | 200 <level>         | Level ___ is about to start        |
+        | 201 <time>          | Time till game starts, 0 means go! |
+        | 202 <ip,playername> | Game Over, announcing winner       |
+        | 102 <x,y>           | Update Location of Client.         |
+
+        */
+
+        // Code 300:
+        if (statusCode == 300) {
+            if (_iAmServer) {
+                _network.sendCode(301,"");
+            }
+
+        } else if (statusCode == 301) {
+            // Code 301:  I am server
+            if (_server == null) {
+                _server = from;
+            }
+
+        } else if (statusCode == 100) {
+            // Code 100 <playername> - Player joining game
+            if (_iAmServer) {
+                // Add them to list of players:
+                if (!otherPlayers.containsKey(from.getHostAddress())) {
+
+                    MultiPlayerGhostSprite other = new MultiPlayerGhostSprite(0,0);
+                    otherPlayers.put(from.getHostAddress(), other);
+                    _state.getSprites().add(other);
+
+                    // Accepting them.
+                    _network.sendCode(101, from.getHostAddress() );
+
+                } else {
+                    // This is weird, since the other player is already in our list, but they don't think they are.
+                    // Shouldn't really happen ever.
+                    // TODO: Implement a method to handle this.
+
+                }
+
+            }
+        } else if (statusCode == 101) {
+            // Code 101 <ip> - Player has been accepted into game
+            if (!_iAmServer && event == _myIP) {
+                // I have been accepted into the game!
+
+                // TODO:  Start my crusing around the game lobby
+            } else if (!_iAmServer) {
+                // Add them into our list of sprites
+                otherPlayers.put(from.getHostAddress(), new MultiPlayerGhostSprite(0,0));
+            }
+        } else if (statusCode == 102) {
+            // Player is in game
+            if (!otherPlayers.containsKey(from.getHostAddress())) {
+                // Whoops, we have found a new player who isn't in our list.
+                MultiPlayerGhostSprite newSprite =  new MultiPlayerGhostSprite(0,0);
+
+                otherPlayers.put(from.getHostAddress(), newSprite);
+
+                _state.getSprites().add(newSprite);
+
+                if (_iAmServer) {
+                    // Broadcast and let everyone know about the player
+                    _network.sendCode(101, from.getHostAddress());
+                }
+            }
+
+            // Code 200 <level> - Level is about to start
+        } else if (statusCode == 200) {
+            _level = event;
+
+
+        } else if (statusCode == 201) {
+            // Code 201 <time> - Time till game starts
+            TextView counter = (TextView) findViewById(R.id.level_name);
+            counter.setText(event);
+            _timeToStart = Integer.parseInt(event);
+
+            if (_timeToStart == 0) {
+
+                // Game Started
+                // TODO:  Make game start
+            }
+
+        } else if (statusCode == 202) {
+            // Code 202 <ip,playername> - Game Over, announcing winner
+
+        } else if (statusCode == 102) {
+            // Code 102 <x,y> update location of player
+            MultiPlayerGhostSprite update = (MultiPlayerGhostSprite)otherPlayers.get(from.getHostAddress());
+            update.setXPos(Float.parseFloat(event.split(",")[0]));
+            update.setXPos(Float.parseFloat(event.split(",")[1]));
+
+        }
+    }
+
+
+
     /**
      * Sensor accuracy changed
      * Currently unused
@@ -296,4 +488,17 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     }
     //endregion
+
+    public void onStartGameButton(View button) {
+
+        // Messy code to get a GameState.Level from an int passed through the intent system
+        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
+        if (levelNum == null)
+            levelNum = GameState.Level.Random;
+        // Save state
+        _state = GameState.GENERATE(levelNum, this);
+
+
+
+    }
 }

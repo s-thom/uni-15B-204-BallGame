@@ -76,16 +76,13 @@ public class MultiplayerNetwork {
     }
 
     public void sendCode(int code, String vars) {
-
         // Format it for data sending:
         // Format should be 3 digit code, plus any parameters (e.g a 300 hello)
-
         String output = String.valueOf(code) + " " + vars;
 
         DatagramPacket out = new DatagramPacket(output.getBytes(), output.length(), inetAd, port);
         try {
             ms.send(out);
-
         } catch (IOException e) {
             e.printStackTrace();
             for ( MultiplayerEventListener mel : _listeners ) {
@@ -93,12 +90,6 @@ public class MultiplayerNetwork {
             }
         }
 
-
-
     }
-
-
-
-
 
 }
