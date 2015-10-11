@@ -29,7 +29,7 @@ public class GameState {
     protected boolean _isComplete;
     protected PointF _offset;
 
-    public enum Level { Random, Scrolling }
+    public enum Level { Random, Scrolling, Empty }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -335,6 +335,14 @@ public class GameState {
             //sprites.add(new WallSprite(1, 1, 3, 3));
 
             return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
+        } else if (l == Level.Empty) {
+            List<GenericSprite> sprites = new ArrayList<GenericSprite>();
+            sprites.add(new WallSprite(0, -1, 10, 1));
+            sprites.add(new WallSprite(-1, 0, 1, 10));
+            sprites.add(new WallSprite(0, 10, 10, 1));
+            sprites.add(new WallSprite(10, 0, 1, 10));
+            return new GameState(c.getString(R.string.level_empty), new Point(10,10), new PointF(5, 5), sprites);
+
         }
 
 
@@ -352,6 +360,8 @@ public class GameState {
                 return Level.Random;
             case "Scrolling":
                 return Level.Scrolling;
+            case "Empty":
+                return Level.Empty;
             default:
                 throw new IllegalArgumentException("Level not defined yet");
         }
