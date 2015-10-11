@@ -29,7 +29,7 @@ public class GameState {
     protected boolean _isComplete;
     protected PointF _offset;
 
-    public enum Level { Random, Bugged }
+    public enum Level { Random, Scrolling }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -233,6 +233,10 @@ public class GameState {
                                 _isComplete = true;
                                 addScore(1);
                             }
+                        } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
+                            if (t.isCollidedWith(s)) {
+                                _isComplete = true;
+                            }
                         }
                     }
                 }
@@ -300,10 +304,15 @@ public class GameState {
 
             GameState newLevel = new GameState(c.getString(R.string.level_random), new Point(levelX, levelY), new PointF(0, 0), sprites);
             return newLevel;
-        } else if (l == Level.Bugged) {
+        } else if (l == Level.Scrolling) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
+
+            DeathSprite ds = new DeathSprite(0, 0, 1, 1);
+            ds.setMotion(0.01f, 0);
+            sprites.add(ds);
+
             sprites.add(new WallSprite(1, 1, 3, 3));
-            return new GameState(c.getString(R.string.level_bugged), new Point(5, 5), new PointF(2.5f, 2.5f), sprites);
+            return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites);
         }
 
 
@@ -319,8 +328,8 @@ public class GameState {
         switch (name) {
             case "Random":
                 return Level.Random;
-            case "Bugged":
-                return Level.Bugged;
+            case "Scrolling":
+                return Level.Scrolling;
             default:
                 throw new IllegalArgumentException("Level not defined yet");
         }

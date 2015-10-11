@@ -16,7 +16,14 @@ public class ScrollingGameState extends GameState {
     /**
      * Class used to pass values between drawing and updating classes
      */
-    public ScrollingGameState(String title, Point levelSize, PointF playerPosition, float speed) {
+    public ScrollingGameState(String title, Point levelSize, PointF playerPosition) {
+        this(title, levelSize, playerPosition, new ArrayList<GenericSprite>());
+    }
+
+    /**
+     * Class used to pass values between drawing and updating classes
+     */
+    public ScrollingGameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites) {
         this(title, levelSize, playerPosition, new ArrayList<GenericSprite>(), -0.01f);
     }
 

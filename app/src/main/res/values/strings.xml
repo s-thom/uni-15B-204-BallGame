@@ -35,5 +35,5 @@
 
     <string name="level_select">Select Level:</string>
     <string name="level_random">Random</string>
-    <string name="level_bugged">Bugged</string>
+    <string name="level_scrolling">Scrolling</string>
 </resources>

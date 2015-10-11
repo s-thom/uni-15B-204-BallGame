@@ -12,6 +12,6 @@
     </string-array>
     <string-array name="level_names">
         <item>@string/level_random</item>
-        <item>@string/level_bugged</item>
+        <item>@string/level_scrolling</item>
     </string-array>
 </resources>
