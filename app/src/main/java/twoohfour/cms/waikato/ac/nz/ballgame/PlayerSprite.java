@@ -20,6 +20,7 @@ public class PlayerSprite extends GenericSprite implements ICollides {
     public PlayerSprite(float x, float y, float weight) {
         super(x, y, 0.5f, 0.5f, weight);
         _paint.setColor(Color.RED);
+        _friction = 1;
     }
 
 

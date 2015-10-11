@@ -18,7 +18,7 @@ public abstract class GenericSprite {
     protected PointF _motion;
     protected float MAX_VELOCITY = 0.2f;
     protected float _weightModifier = 1; // This is 1 / Weight, so it can be multiplied straight into motion calculations
-    protected float _friction = 1;
+    protected float _friction = 0;
     protected final float FRICTION_CONSTANT = 0.05f;
     //endregion
 

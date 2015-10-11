@@ -20,8 +20,6 @@ public class DeathSprite extends GenericSprite {
     public DeathSprite(int leftPos, int topPos, int width, int height) {
         super(leftPos, topPos, width, height);
         _paint.setColor(Color.RED);
-        _friction = 0;
-
     }
 
 
