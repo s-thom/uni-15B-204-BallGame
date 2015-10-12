@@ -219,15 +219,12 @@ public class GameState {
             // Do all processing before updating
             for (GenericSprite s : _sprites) {
 
-                boolean hasBounced = false;
-
                 for (GenericSprite t : _sprites){
                     if (t != s) {
-                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s) && !hasBounced) {
+                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s)) {
 
                             ((IBouncable) t).bounceFrom(s);
 
-                            hasBounced = true;
                         } else if (t instanceof FinishSprite && s instanceof PlayerSprite) {
                             if (t.isCollidedWith(s)){
                                 _isComplete = true;
