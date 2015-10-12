@@ -331,6 +331,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Save state
         _state = GameState.GENERATE(levelNum, this);
 
+        _view.setState(_state);
+        
+        // Force recalcualtion of view positions
+        _view.setVisibility(View.GONE);
+        _view.setVisibility(View.VISIBLE);
 
 
     }
