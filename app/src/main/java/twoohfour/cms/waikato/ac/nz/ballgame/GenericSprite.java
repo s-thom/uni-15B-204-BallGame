@@ -18,7 +18,7 @@ public abstract class GenericSprite {
     protected PointF _motion;
     protected float MAX_VELOCITY = 0.2f;
     protected float _weightModifier = 1; // This is 1 / Weight, so it can be multiplied straight into motion calculations
-    protected float _friction = 1;
+    protected float _friction = 0;
     protected final float FRICTION_CONSTANT = 0.05f;
     //endregion
 
@@ -47,7 +47,7 @@ public abstract class GenericSprite {
     }
 
     public GenericSprite(float x, float y, float w, float h, float dx, float dy, float weight) {
-        this(x, y, w, h, dx, dy, weight, 1);
+        this(x, y, w, h, dx, dy, weight, 0);
     }
 
     public GenericSprite(float x, float y, float w, float h, float dx, float dy, float weight, float friction) {
@@ -278,7 +278,7 @@ public abstract class GenericSprite {
      * @param canvas Canvas to draw on
      * @param scale Scale at which to draw
      */
-    public abstract void draw(Canvas canvas, float scale);
+    public abstract void draw(Canvas canvas, float scale, PointF offset);
 
     /**
      * Update the sprite

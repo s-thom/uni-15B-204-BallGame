@@ -11,7 +11,7 @@ import android.util.Log;
 /**
  * Created by Stuart on 25/09/2015.
  */
-public class PlayerSprite extends GenericSprite {
+public class PlayerSprite extends GenericSprite implements ICollides {
 
     public PlayerSprite(float x, float y) {
         this(x, y, 1);
@@ -20,6 +20,7 @@ public class PlayerSprite extends GenericSprite {
     public PlayerSprite(float x, float y, float weight) {
         super(x, y, 0.5f, 0.5f, weight);
         _paint.setColor(Color.RED);
+        _friction = 1;
     }
 
 
@@ -29,9 +30,9 @@ public class PlayerSprite extends GenericSprite {
      * @param scale Scale at which to draw
      */
     @Override
-    public void draw(Canvas canvas, float scale) {
+    public void draw(Canvas canvas, float scale, PointF offset) {
         float radius = getWidth() / 2;
-        canvas.drawCircle((getXPos() + radius) * scale, (getYPos() + radius) * scale, radius * scale, _paint);
+        canvas.drawCircle((getXPos() + radius + offset.x) * scale, (getYPos() + radius + offset.y) * scale, radius * scale, _paint);
     }
 
     /**

@@ -21,7 +21,7 @@ public class BumperSprite extends GenericSprite implements IBouncable {
     }
 
     @Override
-    public void draw(Canvas canvas, float scale) {
+    public void draw(Canvas canvas, float scale, PointF offset) {
         float radius = getWidth() / 2;
 
         if (_cooldown > 0)
@@ -29,7 +29,7 @@ public class BumperSprite extends GenericSprite implements IBouncable {
         else
             _paint.setColor(Color.rgb(140, 20, 115));
 
-        canvas.drawCircle((getXPos() + radius) * scale, (getYPos() + radius) * scale, radius * scale, _paint);
+        canvas.drawCircle((getXPos() + radius + offset.x) * scale, (getYPos() + radius + offset.y) * scale, radius * scale, _paint);
     }
 
     @Override

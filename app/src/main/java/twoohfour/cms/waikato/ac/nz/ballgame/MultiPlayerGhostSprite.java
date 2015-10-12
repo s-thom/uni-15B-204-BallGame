@@ -30,9 +30,9 @@ public class MultiPlayerGhostSprite extends GenericSprite {
          * @param scale Scale at which to draw
          */
         @Override
-        public void draw(Canvas canvas, float scale) {
+        public void draw(Canvas canvas, float scale, PointF offset) {
             float radius = getWidth() / 2;
-            canvas.drawCircle((getXPos() + radius) * scale, (getYPos() + radius) * scale, radius * scale, _paint);
+            canvas.drawCircle((getXPos() + radius + offset.x) * scale, (getYPos() + radius + offset.y) * scale, radius * scale, _paint);
         }
 
         /**

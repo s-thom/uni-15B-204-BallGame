@@ -2,6 +2,7 @@ package twoohfour.cms.waikato.ac.nz.ballgame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -74,8 +75,8 @@ public abstract class ImageSprite extends GenericSprite {
      * @param scale Scale at which to draw
      */
     @Override
-    public void draw(Canvas canvas, float scale) {
-        RectF r = new RectF(_rect.left * scale, _rect.top * scale, _rect.right * scale, _rect.bottom * scale);
+    public void draw(Canvas canvas, float scale, PointF offset) {
+        RectF r = new RectF((_rect.left + offset.x) * scale, (_rect.top + offset.y) * scale, (_rect.right + offset.x) * scale, (_rect.bottom + offset.y) * scale);
         canvas.drawBitmap(_img, _imgRect, r, _paint);
     }
 }
