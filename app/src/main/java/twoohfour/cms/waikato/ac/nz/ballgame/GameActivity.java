@@ -439,8 +439,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                                 MultiPlayerGhostSprite other = new MultiPlayerGhostSprite(0, 0);
                                 otherPlayers.put(from.getHostAddress(), other);
-                                _state.getSprites().add(other);
-
+                                synchronized (_state) {
+                                    _state.getSprites().add(other);
+                                }
                                 // Accepting them.
                                 _network.sendCode(101, from.getHostAddress());
 
@@ -470,7 +471,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                             otherPlayers.put(from.getHostAddress(), newSprite);
 
-                            _state.getSprites().add(newSprite);
+                            synchronized (_state) {
+                                _state.getSprites().add(newSprite);
+                            }
 
                             if (_iAmServer) {
                                 // Broadcast and let everyone know about the player
@@ -502,7 +505,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         // Code 102 <x,y> update location of player
                         MultiPlayerGhostSprite update = (MultiPlayerGhostSprite) otherPlayers.get(from.getHostAddress());
                         update.setXPos(Float.parseFloat(event.split(",")[0]));
-                        update.setXPos(Float.parseFloat(event.split(",")[1]));
+                        update.setYPos(Float.parseFloat(event.split(",")[1]));
 
                     }
                 }
