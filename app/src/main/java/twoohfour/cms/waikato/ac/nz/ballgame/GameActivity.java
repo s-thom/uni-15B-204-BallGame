@@ -475,6 +475,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         | 202 <ip,playername> | Game Over, announcing winner       |
         | 102 <x,y>           | Update Location of Client.         |
 
+        *//*
+        THE STUART TABLE
+
+        | Code                | Description                        |
+        |---------------------|------------------------------------|
+        | 102 <x,y>           | Update Location of Client.         |
+        | 103                 | I am ready                         |
+        | 104                 | I am leaving                       |
+
         */
             if (from.getHostAddress() != _myIP) {
                 // Code 300:
