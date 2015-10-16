@@ -13,5 +13,6 @@
     <string-array name="level_names">
         <item>@string/level_random</item>
         <item>@string/level_scrolling</item>
+        <item>@string/level_one</item>
     </string-array>
 </resources>

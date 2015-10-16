@@ -29,7 +29,7 @@ public class GameState {
     protected boolean _isComplete;
     protected PointF _offset;
 
-    public enum Level { Random, Scrolling }
+    public enum Level { Random, Scrolling, LevelOne }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -335,6 +335,33 @@ public class GameState {
             //sprites.add(new WallSprite(1, 1, 3, 3));
 
             return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
+        }else if (l == Level.LevelOne) {
+            List<GenericSprite> sprites = new ArrayList<GenericSprite>();
+
+            FinishSprite fs = new FinishSprite(6, 2, 1, 1);
+            sprites.add(fs);
+
+            sprites.add(new WallSprite(1, 0, 1, 1));
+            sprites.add(new WallSprite(0, 2, 4, 1));
+            sprites.add(new WallSprite(3, 1, 1, 1));
+            sprites.add(new WallSprite(0, 3, 1, 3));
+            sprites.add(new WallSprite(2, 4, 4, 1));
+            sprites.add(new WallSprite(5, 0, 1, 4));
+            sprites.add(new WallSprite(7, 5, 1, 1));
+            sprites.add(new WallSprite(9, 4, 1, 1));
+            sprites.add(new WallSprite(6, 3, 3, 1));
+            sprites.add(new WallSprite(7, 1, 1, 2));
+            sprites.add(new WallSprite(9, 0, 2, 2));
+            sprites.add(new WallSprite(10, 2, 1, 1));
+
+            sprites.add(new WallSprite(0, -1, 11, 1));
+            sprites.add(new WallSprite(-1, 0, 1, 6));
+            sprites.add(new WallSprite(0, 6, 11, 1));
+            sprites.add(new WallSprite(11, 0, 1, 6));
+
+            //sprites.add(new WallSprite(1, 1, 3, 3));
+
+            return new GameState(c.getString(R.string.level_one), new Point(11, 6), new PointF(0.5f, 0.5f), sprites);
         }
 
 
@@ -350,6 +377,8 @@ public class GameState {
         switch (name) {
             case "Random":
                 return Level.Random;
+            case "Level One":
+                return Level.LevelOne;
             case "Scrolling":
                 return Level.Scrolling;
             default:

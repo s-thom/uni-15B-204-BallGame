@@ -35,5 +35,6 @@
 
     <string name="level_select">Select Level:</string>
     <string name="level_random">Random</string>
+    <string name="level_one">Level One</string>
     <string name="level_scrolling">Scrolling</string>
 </resources>
