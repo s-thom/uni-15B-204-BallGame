@@ -202,7 +202,7 @@ public class GameState {
     public boolean isReady() {
 //        if (_viewSize == null)
 //            return false;
-        Log.w("DeprecationWarning", "GameState.isReady() will be removed in later versions");
+       // Log.w("DeprecationWarning", "GameState.isReady() will be removed in later versions");
         return true;
     }
 
@@ -211,7 +211,7 @@ public class GameState {
      * @return Whether the Game is complete
      */
     public boolean isComplete() {
-        Log.w("DeprecationWarning", "GameState.isComplete() will be removed in later versions");
+     //   Log.w("DeprecationWarning", "GameState.isComplete() will be removed in later versions");
         return _isComplete;
     }
 
