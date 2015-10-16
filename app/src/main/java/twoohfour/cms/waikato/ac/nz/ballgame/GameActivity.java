@@ -195,8 +195,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Stops things going wrong when FPS forced to different values
         synchronized (_state) {
             _state.update();
+            GameState.State _mode = _state.getState();
 
-            if (_state.isComplete()) {
+            if (_mode == GameState.State.Spectating) {
                 Intent i = new Intent();
                 i.putExtra(EXTRA_SCORE, _state.getScore());
 

@@ -28,8 +28,10 @@ public class GameState {
     protected int _ticks;
     protected boolean _isComplete;
     protected PointF _offset;
+    protected State _state;
 
     public enum Level { Random, Scrolling, Empty }
+    public enum State {Waiting, Playing, Spectating}
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -130,6 +132,14 @@ public class GameState {
     }
 
     /**
+     * Gets the number of updates the game has had
+     * @return Number of ticks
+     */
+    public State getState() {
+        return _state;
+    }
+
+    /**
      * Sets the values of gravity in the array
      * @param x Acceleration in X direction
      * @param y Acceleration in Y direction
@@ -192,7 +202,7 @@ public class GameState {
     public boolean isReady() {
 //        if (_viewSize == null)
 //            return false;
-
+        Log.w("DeprecationWarning", "GameState.isReady() will be removed in later versions");
         return true;
     }
 
@@ -201,6 +211,7 @@ public class GameState {
      * @return Whether the Game is complete
      */
     public boolean isComplete() {
+        Log.w("DeprecationWarning", "GameState.isComplete() will be removed in later versions");
         return _isComplete;
     }
 
@@ -227,12 +238,12 @@ public class GameState {
 
                         } else if (t instanceof FinishSprite && s instanceof PlayerSprite) {
                             if (t.isCollidedWith(s)){
-                                _isComplete = true;
+                                _state = State.Spectating;
                                 addScore(1);
                             }
                         } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
                             if (t.isCollidedWith(s)) {
-                                _isComplete = true;
+                                _state = State.Spectating;
                             }
                         }
                     }
@@ -240,6 +251,9 @@ public class GameState {
             }
 
             for (GenericSprite s : _sprites) {
+                if (s instanceof PlayerSprite && _state == State.Spectating) {
+                    continue;
+                }
                 s.update(this);
             }
         }
