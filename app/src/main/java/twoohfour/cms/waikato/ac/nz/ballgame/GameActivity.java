@@ -193,15 +193,16 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // from drawing if we want to
         // Principle of game design
         // Stops things going wrong when FPS forced to different values
+        synchronized (_state) {
+            _state.update();
 
-        _state.update();
+            if (_state.isComplete()) {
+                Intent i = new Intent();
+                i.putExtra(EXTRA_SCORE, _state.getScore());
 
-        if (_state.isComplete()) {
-            Intent i = new Intent();
-            i.putExtra(EXTRA_SCORE, _state.getScore());
-
-            setResult(RESULT_OK, i);
-            finish();
+                setResult(RESULT_OK, i);
+                finish();
+            }
         }
     }
 
@@ -213,7 +214,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         float gravChangeFactor = 0.05f;
 
         int id = button.getId();
-        float[] currGrav = _state.getGravity();
+
+        float[] currGrav;
+        synchronized (_state){
+            currGrav = _state.getGravity();
+        }
+
         if (id == R.id.button_grav_up)
             currGrav[1] -= gravChangeFactor;
         else if (id == R.id.button_grav_down)
@@ -223,7 +229,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         else if (id == R.id.button_grav_right)
             currGrav[0] += gravChangeFactor;
 
-        _state.setGravity(currGrav[0], currGrav[1], currGrav[2]);
+        synchronized (_state) {
+            _state.setGravity(currGrav[0], currGrav[1], currGrav[2]);
+        }
     }
     //endregion
 
@@ -270,15 +278,20 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 gravY = gravY * SPEED * sensitivity;
                 gravZ = gravZ * SPEED * sensitivity;
             } else {
-                float[] gravValues = _state.getGravity();
+                float[] gravValues;
+                synchronized (_state){
+                    gravValues = _state.getGravity();
+                }
 
                 gravX = gravValues[0];
                 gravY = gravValues[1];
                 gravZ = gravValues[2];
             }
 
-            // Store gravity values
-            _state.setGravity(gravX, gravY, gravZ);
+            synchronized (_state) {
+                // Store gravity values
+                _state.setGravity(gravX, gravY, gravZ);
+            }
 
 
             if (debug) {
@@ -299,11 +312,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 TextView pdx = (TextView) findViewById(R.id.player_dx);
                 TextView pdy = (TextView) findViewById(R.id.player_dy);
                 // Set text
-                PlayerSprite player = _state.getPlayer();
-                px.setText("x: " + player.getXPos());
-                py.setText("y: " + player.getYPos());
-                pdx.setText("dx: " + player.getMotion().x);
-                pdy.setText("dy: " + player.getMotion().y);
+                synchronized (_state) {
+                    PlayerSprite player = _state.getPlayer();
+                    px.setText("x: " + player.getXPos());
+                    py.setText("y: " + player.getYPos());
+                    pdx.setText("dx: " + player.getMotion().x);
+                    pdy.setText("dy: " + player.getMotion().y);
+                }
             }
         }
     }
