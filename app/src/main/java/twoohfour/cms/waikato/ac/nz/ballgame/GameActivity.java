@@ -348,6 +348,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         private final static int othersNetworkResponseTime = 200;
         private String _myIP;
         private InetAddress _myInet;
+        private Timer _netTimer;
+
+        private final int NETWORK_UPDATES_PER_SECOND = 20;
 
         @Override
         public void run() {
@@ -390,7 +393,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
 
 
+            // Start update loop
+            _netTimer = new Timer("Network");
+            _netTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (_state) {
+                        PlayerSprite player = _state.getPlayer();
+                        _network.sendCode(102, player.getXPos() + "," + player.getYPos());
+                    }
 
+                }
+            }, 0, 1000 / NETWORK_UPDATES_PER_SECOND);
 
         }
 
