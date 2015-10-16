@@ -42,11 +42,16 @@ public class GameState {
     public GameState(String title, Point levelSize, PointF playerPosition) {
         this(title, levelSize, playerPosition, new ArrayList<GenericSprite>());
     }
-
     /**
      * Class used to pass values between drawing and updating classes
      */
     public GameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites) {
+        this(title, levelSize, playerPosition, sprites, State.Playing);
+    }
+    /**
+     * Class used to pass values between drawing and updating classes
+     */
+    public GameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites, State state) {
         _grav = new float[3];
         _sprites = sprites; // As it's a reference, external class can still add sprites
         _levelSize = levelSize;
@@ -54,6 +59,7 @@ public class GameState {
         _sprites.add(_player);
         _title = title;
         _offset = new PointF(0, 0);
+        _state = state;
     }
 
     //region Getters & Setters
