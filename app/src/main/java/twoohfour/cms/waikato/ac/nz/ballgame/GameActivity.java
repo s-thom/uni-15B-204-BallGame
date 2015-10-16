@@ -478,11 +478,31 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         | 104                 | I am leaving                       |
 
         */
-            if (from.getHostAddress() != _myIP) {
-                // Code 300:
+            String otherAddress = from.getHostAddress();
+            if (otherAddress != _myIP) {
 
                 switch (statusCode) {
                     case 102:
+                        String[] messageSplit = event.split(",");
+                        float[] posArray = new float[2];
+                        try {
+                            posArray[0] = Float.parseFloat(messageSplit[0]);
+                            posArray[1] = Float.parseFloat(messageSplit[1]);
+                        } catch (NumberFormatException ex) {
+                            posArray[0] = 0;
+                            posArray[1] = 0;
+                        }
+                        if (!otherPlayers.containsKey(otherAddress)) {
+                            MultiPlayerGhostSprite newSprite = new MultiPlayerGhostSprite(posArray[0], posArray[1]);
+                            otherPlayers.put(otherAddress, newSprite);
+                            synchronized (_state){
+                                _state.getSprites().add(newSprite);
+                            }
+                        } else {
+                            MultiPlayerGhostSprite s = (MultiPlayerGhostSprite)otherPlayers.get(otherAddress);
+                            s.setXPos(posArray[0]);
+                            s.setYPos(posArray[1]);
+                        }
                         break;
                     case 103:
                         break;
