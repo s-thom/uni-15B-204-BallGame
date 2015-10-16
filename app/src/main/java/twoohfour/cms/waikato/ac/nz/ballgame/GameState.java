@@ -29,7 +29,7 @@ public class GameState {
     protected boolean _isComplete;
     protected PointF _offset;
 
-    public enum Level { Random, Scrolling, LevelOne }
+    public enum Level { Random, Scrolling, LevelOne, Death, Happy }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -335,7 +335,7 @@ public class GameState {
             //sprites.add(new WallSprite(1, 1, 3, 3));
 
             return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
-        }else if (l == Level.LevelOne) {
+        } else if (l == Level.LevelOne) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
 
             FinishSprite fs = new FinishSprite(6, 2, 1, 1);
@@ -359,9 +359,33 @@ public class GameState {
             sprites.add(new WallSprite(0, 6, 11, 1));
             sprites.add(new WallSprite(11, 0, 1, 6));
 
-            //sprites.add(new WallSprite(1, 1, 3, 3));
+            return new GameState(c.getString(R.string.level_one), new Point(11, 6), new PointF(0, 0), sprites);
+        } else if (l == Level.Death) {
+            List<GenericSprite> sprites = new ArrayList<GenericSprite>();
 
-            return new GameState(c.getString(R.string.level_one), new Point(11, 6), new PointF(0.5f, 0.5f), sprites);
+            FinishSprite fs = new FinishSprite(1, 1, 1, 1);
+            sprites.add(fs);
+
+            sprites.add(new DeathSprite(0, 0, 4, 1));
+            sprites.add(new DeathSprite(0, 1, 1, 4));
+            sprites.add(new DeathSprite(1, 4, 4, 1));
+            sprites.add(new DeathSprite(4, 0, 1, 4));
+            sprites.add(new DeathSprite(1, 2, 2, 1));
+
+            return new GameState(c.getString(R.string.level_death), new Point(5, 5), new PointF(1.25f, 3.25f), sprites);
+        } else if (l == Level.Happy) {
+            List<GenericSprite> sprites = new ArrayList<GenericSprite>();
+
+            FinishSprite fs = new FinishSprite(1, 1, 1, 1);
+            sprites.add(fs);
+
+            sprites.add(new WallSprite(0, 0, 4, 1));
+            sprites.add(new WallSprite(0, 1, 1, 4));
+            sprites.add(new WallSprite(1, 4, 4, 1));
+            sprites.add(new WallSprite(4, 0, 1, 4));
+            sprites.add(new WallSprite(1, 2, 2, 1));
+
+            return new GameState(c.getString(R.string.level_happy), new Point(5, 5), new PointF(1.25f, 3.25f), sprites);
         }
 
 
@@ -381,6 +405,10 @@ public class GameState {
                 return Level.LevelOne;
             case "Scrolling":
                 return Level.Scrolling;
+            case "Happy Valley":
+                return Level.Happy;
+            case "Death Valley":
+                return Level.Death;
             default:
                 throw new IllegalArgumentException("Level not defined yet");
         }

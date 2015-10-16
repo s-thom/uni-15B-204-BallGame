@@ -46,7 +46,7 @@ public class DeathSprite extends GenericSprite {
     //region IBouncable methods
     @Override
     public boolean isCollidedWith(GenericSprite sprite) {
-        return _rect.contains(sprite.getRectangle());
+        return super.isCollidedWith(sprite);
     }
 
 
