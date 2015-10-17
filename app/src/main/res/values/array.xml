@@ -11,7 +11,10 @@
         <item>4</item>
     </string-array>
     <string-array name="level_names">
-        <item>@string/level_random</item>
+        <item>@string/level_one</item>
         <item>@string/level_scrolling</item>
+        <item>@string/level_happy</item>
+        <item>@string/level_death</item>
+        <item>@string/level_random</item>
     </string-array>
 </resources>

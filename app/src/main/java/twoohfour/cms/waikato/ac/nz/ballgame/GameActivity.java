@@ -102,6 +102,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             Log.e("GameActivity", "Couldn't hide action bar");
         }
 
+        // Messy code to get a GameState.Level from an int passed through the intent system
+        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
+        if (levelNum == null)
+            levelNum = GameState.Level.LevelOne;
+        // Save state
+        _state = GameState.GENERATE(levelNum, this);
 
     }
 
