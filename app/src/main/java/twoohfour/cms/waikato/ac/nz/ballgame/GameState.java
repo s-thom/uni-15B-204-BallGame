@@ -28,8 +28,10 @@ public class GameState {
     protected int _ticks;
     protected boolean _isComplete;
     protected PointF _offset;
+    protected State _state;
 
-    public enum Level { Random, Scrolling, LevelOne, Death, Happy }
+    public enum State {Waiting, Playing, Spectating}
+    public enum Level { Random, Scrolling, Empty, LevelOne, Death, Happy }
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -40,11 +42,16 @@ public class GameState {
     public GameState(String title, Point levelSize, PointF playerPosition) {
         this(title, levelSize, playerPosition, new ArrayList<GenericSprite>());
     }
-
     /**
      * Class used to pass values between drawing and updating classes
      */
     public GameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites) {
+        this(title, levelSize, playerPosition, sprites, State.Playing);
+    }
+    /**
+     * Class used to pass values between drawing and updating classes
+     */
+    public GameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites, State state) {
         _grav = new float[3];
         _sprites = sprites; // As it's a reference, external class can still add sprites
         _levelSize = levelSize;
@@ -52,6 +59,7 @@ public class GameState {
         _sprites.add(_player);
         _title = title;
         _offset = new PointF(0, 0);
+        _state = state;
     }
 
     //region Getters & Setters
@@ -130,6 +138,14 @@ public class GameState {
     }
 
     /**
+     * Gets the number of updates the game has had
+     * @return Number of ticks
+     */
+    public State getState() {
+        return _state;
+    }
+
+    /**
      * Sets the values of gravity in the array
      * @param x Acceleration in X direction
      * @param y Acceleration in Y direction
@@ -192,7 +208,7 @@ public class GameState {
     public boolean isReady() {
 //        if (_viewSize == null)
 //            return false;
-
+       // Log.w("DeprecationWarning", "GameState.isReady() will be removed in later versions");
         return true;
     }
 
@@ -201,6 +217,7 @@ public class GameState {
      * @return Whether the Game is complete
      */
     public boolean isComplete() {
+     //   Log.w("DeprecationWarning", "GameState.isComplete() will be removed in later versions");
         return _isComplete;
     }
 
@@ -219,23 +236,20 @@ public class GameState {
             // Do all processing before updating
             for (GenericSprite s : _sprites) {
 
-                boolean hasBounced = false;
-
                 for (GenericSprite t : _sprites){
                     if (t != s) {
-                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s) && !hasBounced) {
+                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s)) {
 
                             ((IBouncable) t).bounceFrom(s);
 
-                            hasBounced = true;
                         } else if (t instanceof FinishSprite && s instanceof PlayerSprite) {
                             if (t.isCollidedWith(s)){
-                                _isComplete = true;
+                                _state = State.Spectating;
                                 addScore(1);
                             }
                         } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
                             if (t.isCollidedWith(s)) {
-                                _isComplete = true;
+                                _state = State.Spectating;
                             }
                         }
                     }
@@ -243,6 +257,9 @@ public class GameState {
             }
 
             for (GenericSprite s : _sprites) {
+                if (s instanceof PlayerSprite && _state == State.Spectating) {
+                    continue;
+                }
                 s.update(this);
             }
         }
@@ -335,6 +352,13 @@ public class GameState {
             //sprites.add(new WallSprite(1, 1, 3, 3));
 
             return new ScrollingGameState(c.getString(R.string.level_scrolling), new Point(5, 5), new PointF(2.5f, 2.5f), sprites, -0.01f);
+        } else if (l == Level.Empty) {
+            List<GenericSprite> sprites = new ArrayList<GenericSprite>();
+            sprites.add(new WallSprite(0, -1, 10, 1));
+            sprites.add(new WallSprite(-1, 0, 1, 10));
+            sprites.add(new WallSprite(0, 10, 10, 1));
+            sprites.add(new WallSprite(10, 0, 1, 10));
+            return new GameState(c.getString(R.string.level_empty), new Point(10,10), new PointF(5, 5), sprites);
         } else if (l == Level.LevelOne) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
 
@@ -405,6 +429,8 @@ public class GameState {
                 return Level.LevelOne;
             case "Scrolling":
                 return Level.Scrolling;
+            case "Empty":
+                return Level.Empty;
             case "Happy Valley":
                 return Level.Happy;
             case "Death Valley":

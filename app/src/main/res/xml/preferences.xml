@@ -11,7 +11,14 @@
             android:entries="@array/pref_sensitivity_entries"
             android:entryValues="@array/pref_sensitivity_values"
             android:defaultValue="@string/pref_sensitivity_default_value" />
+        <CheckBoxPreference
+            android:key="pref_mp"
+            android:title="@string/pref_mp"
+            android:summary="Play Multiplayer"
+            android:defaultValue="false"
+            />
     </PreferenceCategory>
+
     <PreferenceCategory
         android:key="dev_options"
         android:title="@string/pref_title_dev">

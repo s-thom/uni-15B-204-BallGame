@@ -35,4 +35,14 @@
         android:inflatedId="@+id/debug_info"
         android:layout="@layout/layout_debug"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mp_ready"
+        android:id="@+id/buttonStartGame"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="onStartGameButton" />
+
 </RelativeLayout>

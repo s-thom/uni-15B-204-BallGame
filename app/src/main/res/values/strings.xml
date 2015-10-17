@@ -31,7 +31,12 @@
     <string name="key_pref_sensitivity">pref_sensitivity</string>
     <string name="key_pref_debug">pref_debug</string>
     <string name="key_pref_debug_buttons">pref_debug_buttons</string>
+    <string name="key_pref_mp">pref_mp</string>
 
+
+    <string name="pref_mp">Multiplayer</string>
+
+    <string name="mp_ready">Ready</string>
 
     <string name="level_select">Select Level:</string>
     <string name="level_random">Random</string>
@@ -39,4 +44,6 @@
     <string name="level_happy">Happy Valley</string>
     <string name="level_death">Death Valley</string>
     <string name="level_scrolling">Scrolling</string>
+    <string name="level_empty">Waiting</string>
+    <string name="level_finished">Finished</string>
 </resources>
