@@ -249,7 +249,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         _view.setVisibility(View.GONE);
         _view.setVisibility(View.VISIBLE);
 
-        findViewById(R.id.gameButton).setVisibility(View.GONE);
+        findViewById(R.id.buttonStartGame).setVisibility(View.GONE);
     }
 
 
