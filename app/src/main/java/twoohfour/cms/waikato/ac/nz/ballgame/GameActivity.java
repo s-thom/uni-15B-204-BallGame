@@ -101,14 +101,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             Log.e("GameActivity", "Couldn't hide action bar");
         }
 
-        if (_isMp) {
-            // Messy code to get a GameState.Level from an int passed through the intent system
-            GameState.Level levelNum = GameState.Level.Empty;
-            _state = GameState.GENERATE(levelNum, this);
-        } else {
-            startLevel();
-        }
-
 
     }
 
@@ -128,7 +120,16 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_game);
 
         // Set drawable view state
+
         _view = (DrawableView) findViewById(R.id.draw_view);
+
+        if (_isMp) {
+            // Messy code to get a GameState.Level from an int passed through the intent system
+            GameState.Level levelNum = GameState.Level.Empty;
+            _state = GameState.GENERATE(levelNum, this);
+        } else {
+            startLevel();
+        }
         _view.setState(_state);
 
         if (debug) {
