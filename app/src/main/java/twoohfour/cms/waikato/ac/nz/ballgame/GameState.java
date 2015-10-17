@@ -93,6 +93,7 @@ public class GameState {
     public DrawableView getView() {
         return _view;
     }
+
     /**
      * Gets the dimensions of the level
      *
@@ -223,6 +224,10 @@ public class GameState {
                     } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
                         if (t.isCollidedWith(s)) {
                             _state = State.Spectating;
+                        }
+                    } else if (t instanceof DisappearingWallSprite && s instanceof PlayerSprite) {
+                        if (t.isCollidedWith(s)) {
+                            _sprites.remove(t);
                         }
                     }
                 }
