@@ -11,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -116,6 +117,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         retrievePreferences();
 
+        // String is the ip
+        otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
+
         // Set layouts
         setContentView(R.layout.activity_game);
 
@@ -174,6 +178,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         _netThread.stopTimer();
         _netThread = null;
 
+        Thread quick = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                _network.sendCode(104, "");
+            }
+        });
+        quick.start();
+
         finish();
     }
 
@@ -224,6 +236,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             });
         }
 
+        //Log.i("othersready", new Boolean(_othersReady).toString());
+
         synchronized (_state) {
             _state.update();
             GameState.State _mode = _state.getState();
@@ -246,6 +260,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             levelNum = GameState.Level.Random;
         // Save state
         _state = GameState.GENERATE(levelNum, this);
+
+        List<GenericSprite> spriteList = _state.getSprites();
+        for(Object s : otherPlayers.values()) {
+            spriteList.add((GenericSprite)s);
+        }
 
         _view.setState(_state);
 
@@ -392,6 +411,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void onStartGameButton(View button) {
         button.setEnabled(false);
         _amReady = true;
+
+        Thread quick = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                _network.sendCode(103, "");
+            }
+        });
+
+        quick.start();
     }
 
     private class NetThread extends Thread implements MultiplayerEventListener {
@@ -400,21 +428,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         private InetAddress _myInet;
         private Timer _netTimer;
 
-        private final int NETWORK_UPDATES_PER_SECOND = 1;
+        private final int NETWORK_UPDATES_PER_SECOND = 20;
 
         @Override
         public void run() {
-
-            // String is the ip
-            otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
-
             try {
 
                 _myIP = getIPAddress();
-                Log.w("nettest", _myIP);
                 if (_myIP == null)
                     _myIP = InetAddress.getLocalHost().getHostAddress();
-                Log.w("nettest", _myIP);
                 _myInet = InetAddress.getLocalHost();
             } catch (UnknownHostException e) {
                 // TODO: Implement nicer error message
@@ -431,7 +453,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 public void run() {
                     synchronized (_state) {
                         PlayerSprite player = _state.getPlayer();
-                        _network.sendCode(102, player.getXPos() + "," + player.getYPos());
+                        synchronized (_network) {
+                            _network.sendCode(102, player.getXPos() + "," + player.getYPos());
+                        }
                     }
 
                 }
@@ -480,6 +504,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                     if (!otherPlayers.containsKey(otherAddress)) {
                         addPlayerToHashtable(otherAddress);
+                        _othersReady = false;
                     }
                     MultiPlayerGhostSprite s = (MultiPlayerGhostSprite) otherPlayers.get(otherAddress);
 
@@ -497,7 +522,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                             s.setXPos(posArray[0]);
                             s.setYPos(posArray[1]);
-                            _othersReady = false;
                             break;
                         case 103:
                             s.setReady();
@@ -514,6 +538,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             break;
                         case 104:
                             otherPlayers.remove(otherAddress);
+                            synchronized (_state) {
+                                _state.getSprites().remove(s);
+                            }
+
+                            boolean maybeReady = true;
+                            for (Object sprite : otherPlayers.values()) {
+                                if (!((MultiPlayerGhostSprite) sprite).isReady()) {
+                                    maybeReady = false;
+                                    break;
+                                }
+                            }
+                            if (maybeReady)
+                                _othersReady = true;
                             break;
                         default:
                             Log.e("Net", "Unknown code " + statusCode + " received with message " + event);

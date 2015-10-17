@@ -46,7 +46,7 @@ public class MultiplayerNetwork {
                         DatagramPacket recv = new DatagramPacket(buffer, buffer.length);
                         ms.receive(recv);
                         String message = new String(buffer, "UTF-8");
-                        Log.i("NetIn", recv.getAddress() + " : " + message);
+                        //Log.i("NetIn", recv.getAddress() + " : " + message);
 
                         int statusCode = Integer.parseInt(message.split("\\s+")[0]);
                         String params = message.split("\\s+")[1];
