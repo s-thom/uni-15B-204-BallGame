@@ -47,7 +47,7 @@ public class MultiplayerNetwork {
                         System.out.println(recv.getAddress() + " : " + message);
 
                         int statusCode = Integer.parseInt(message.split("\\s+")[0]);
-                        String params = message.split("\\s(.*)")[1];
+                        String params = message.split("\\s+")[1];
 
                         for ( MultiplayerEventListener mel : _listeners ) {
                             mel.message(statusCode, params, recv.getAddress());

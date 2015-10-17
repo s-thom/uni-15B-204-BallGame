@@ -43,6 +43,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private boolean debug = false;
     private boolean debugButtons = false;
 
+    private boolean _startGame = false;
+    private boolean _amReady = false;
+    private boolean _othersReady = false;
+
+
     private final float MAX_GRAVITY = 4.5f; // Tilting the device past this point will have no effect
     private final int UPDATES_PER_SECOND = 30;
 
@@ -197,6 +202,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // from drawing if we want to
         // Principle of game design
         // Stops things going wrong when FPS forced to different values
+
+        if (_startGame && _amReady && _othersReady) {
+
+            // Get a GameState.Level from intent system
+            GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
+            if (levelNum == null)
+                levelNum = GameState.Level.Random;
+            // Save state
+            _state = GameState.GENERATE(levelNum, this);
+
+            _view.setState(_state);
+
+            // Force recalcualtion of view positions
+            _view.setVisibility(View.GONE);
+            _view.setVisibility(View.VISIBLE);
+
+            _startGame = false;// Forces this condition to only be true once
+        }
+
         synchronized (_state) {
             _state.update();
             GameState.State _mode = _state.getState();
@@ -344,21 +368,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     //endregion
 
     public void onStartGameButton(View button) {
-
-        // Messy code to get a GameState.Level from an int passed through the intent system
-        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
-        if (levelNum == null)
-            levelNum = GameState.Level.Random;
-        // Save state
-        _state = GameState.GENERATE(levelNum, this);
-
-        _view.setState(_state);
-
-        // Force recalcualtion of view positions
-        _view.setVisibility(View.GONE);
-        _view.setVisibility(View.VISIBLE);
-
-
+        button.setEnabled(false);
+        _amReady = true;
     }
 
     private class NetThread extends Thread implements MultiplayerEventListener {
@@ -478,40 +489,58 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         | 104                 | I am leaving                       |
 
         */
-            String otherAddress = from.getHostAddress();
-            if (otherAddress != _myIP) {
+            synchronized (otherPlayers) {
+                String otherAddress = from.getHostAddress();
+                if (otherAddress != _myIP) {
 
-                switch (statusCode) {
-                    case 102:
-                        String[] messageSplit = event.split(",");
-                        float[] posArray = new float[2];
-                        try {
-                            posArray[0] = Float.parseFloat(messageSplit[0]);
-                            posArray[1] = Float.parseFloat(messageSplit[1]);
-                        } catch (NumberFormatException ex) {
-                            posArray[0] = 0;
-                            posArray[1] = 0;
-                        }
-                        if (!otherPlayers.containsKey(otherAddress)) {
-                            MultiPlayerGhostSprite newSprite = new MultiPlayerGhostSprite(posArray[0], posArray[1]);
-                            otherPlayers.put(otherAddress, newSprite);
-                            synchronized (_state){
-                                _state.getSprites().add(newSprite);
+                    if (!otherPlayers.containsKey(otherAddress)) {
+                        addPlayerToHashtable(otherAddress);
+                    }
+                    MultiPlayerGhostSprite s = (MultiPlayerGhostSprite) otherPlayers.get(otherAddress);
+
+                    switch (statusCode) {
+                        case 102:
+                            String[] messageSplit = event.split(",");
+                            float[] posArray = new float[2];
+                            try {
+                                posArray[0] = Float.parseFloat(messageSplit[0]);
+                                posArray[1] = Float.parseFloat(messageSplit[1]);
+                            } catch (Exception ex) {
+                                posArray[0] = 0;
+                                posArray[1] = 0;
                             }
-                        } else {
-                            MultiPlayerGhostSprite s = (MultiPlayerGhostSprite)otherPlayers.get(otherAddress);
+
                             s.setXPos(posArray[0]);
                             s.setYPos(posArray[1]);
-                        }
-                        break;
-                    case 103:
-                        break;
-                    case 104:
-                        break;
-                    default:
-                        Log.w("Net", "Unknown code " + statusCode + " recieved with message " + event);
-                        break;
+                            break;
+                        case 103:
+                            s.setReady();
+
+                            boolean tempReady = true;
+                            for (Object sprite : otherPlayers.values()) {
+                                if (!((MultiPlayerGhostSprite) sprite).isReady()) {
+                                    tempReady = false;
+                                    break;
+                                }
+                            }
+                            if (tempReady)
+                                _othersReady = true;
+                            break;
+                        case 104:
+                            break;
+                        default:
+                            Log.w("Net", "Unknown code " + statusCode + " recieved with message " + event);
+                            break;
+                    }
                 }
+            }
+        }
+
+        private void addPlayerToHashtable(String address) {
+            MultiPlayerGhostSprite newSprite = new MultiPlayerGhostSprite(0, 0);
+            otherPlayers.put(address, newSprite);
+            synchronized (_state) {
+                _state.getSprites().add(newSprite);
             }
         }
 
