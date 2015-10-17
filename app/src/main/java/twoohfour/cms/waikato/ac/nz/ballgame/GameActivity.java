@@ -280,6 +280,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         _view.setVisibility(View.VISIBLE);
 
         findViewById(R.id.buttonStartGame).setVisibility(View.GONE);
+
+        ((TextView)findViewById(R.id.level_name)).setText(_state.getTitle());
     }
 
 
