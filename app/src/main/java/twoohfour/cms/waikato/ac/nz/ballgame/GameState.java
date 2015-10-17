@@ -31,7 +31,8 @@ public class GameState {
     protected State _state;
 
     public enum State {Waiting, Playing, Spectating}
-    public enum Level { Random, Scrolling, Empty, LevelOne, Death, Happy }
+
+    public enum Level {Random, Scrolling, Empty, LevelOne, Death, Happy}
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -42,12 +43,14 @@ public class GameState {
     public GameState(String title, Point levelSize, PointF playerPosition) {
         this(title, levelSize, playerPosition, new ArrayList<GenericSprite>());
     }
+
     /**
      * Class used to pass values between drawing and updating classes
      */
     public GameState(String title, Point levelSize, PointF playerPosition, List<GenericSprite> sprites) {
         this(title, levelSize, playerPosition, sprites, State.Playing);
     }
+
     /**
      * Class used to pass values between drawing and updating classes
      */
@@ -66,6 +69,7 @@ public class GameState {
 
     /**
      * Gets the title of the level to display
+     *
      * @return Title
      */
     public String getTitle() {
@@ -74,6 +78,7 @@ public class GameState {
 
     /**
      * Gets the gravity value array
+     *
      * @return Gravity values
      */
     public float[] getGravity() {
@@ -82,23 +87,15 @@ public class GameState {
 
     /**
      * Gets the DrawableView associated with this GameState
+     *
      * @return
      */
     public DrawableView getView() {
         return _view;
     }
-
-    /**
-     * Gets the DrawableView's size as an array
-     * @return Size values
-     */
-    public int[] getViewSize() {
-        Log.w("DeprecationWarning", "GameState.getViewSize() will be removed in later versions");
-        return _viewSize;
-    }
-
     /**
      * Gets the dimensions of the level
+     *
      * @return Level size
      */
     public Point getLevelSize() {
@@ -107,6 +104,7 @@ public class GameState {
 
     /**
      * Gets the player sprite in this game
+     *
      * @return Player
      */
     public PlayerSprite getPlayer() {
@@ -115,6 +113,7 @@ public class GameState {
 
     /**
      * Gets a list of all sprites in the GameState
+     *
      * @return List of GenericSprite
      */
     public List<GenericSprite> getSprites() {
@@ -123,6 +122,7 @@ public class GameState {
 
     /**
      * Gets the score of this game
+     *
      * @return
      */
     public int getScore() {
@@ -131,6 +131,7 @@ public class GameState {
 
     /**
      * Gets the number of updates the game has had
+     *
      * @return Number of ticks
      */
     public int getGameTime() {
@@ -139,6 +140,7 @@ public class GameState {
 
     /**
      * Gets the number of updates the game has had
+     *
      * @return Number of ticks
      */
     public State getState() {
@@ -147,6 +149,7 @@ public class GameState {
 
     /**
      * Sets the values of gravity in the array
+     *
      * @param x Acceleration in X direction
      * @param y Acceleration in Y direction
      * @param z Acceleration in Z direction
@@ -163,6 +166,7 @@ public class GameState {
      * This is intentional behaviour. It tries to make sure
      * that the view used by the GameActivity is the same one that's
      * beign given all this information
+     *
      * @param view
      */
     public void setView(DrawableView view) {
@@ -173,19 +177,8 @@ public class GameState {
     }
 
     /**
-     * Sets the reported size of the view
-     * @param x Width
-     * @param y Height
-     */
-    public void setViewSize(int x, int y) {
-        Log.w("DeprecationWarning", "GameState.setViewSize() will be removed in later versions");
-        _viewSize = new int[2];
-        _viewSize[0] = x;
-        _viewSize[1] = y;
-    }
-
-    /**
      * Sets the score to the specified value
+     *
      * @param score New score
      */
     public void setScore(int score) {
@@ -194,32 +187,13 @@ public class GameState {
 
     /**
      * Adds the given value onto the score
+     *
      * @param score Number to add to the score
      */
     public void addScore(int score) {
         _score += score;
     }
     //endregion
-
-    /**
-     * Performs checks to see if the game is ready
-     * @return Whether the Game is ready for updates / drawing
-     */
-    public boolean isReady() {
-//        if (_viewSize == null)
-//            return false;
-       // Log.w("DeprecationWarning", "GameState.isReady() will be removed in later versions");
-        return true;
-    }
-
-    /**
-     * Performs checks to see if the game has been finished
-     * @return Whether the Game is complete
-     */
-    public boolean isComplete() {
-     //   Log.w("DeprecationWarning", "GameState.isComplete() will be removed in later versions");
-        return _isComplete;
-    }
 
     /**
      * Update loop
@@ -230,38 +204,36 @@ public class GameState {
         // from drawing if we want to
         // Principle of game design
         // Stops things going wrong when FPS forced to different values
-        if (isReady()) {
-            _ticks++;
+        _ticks++;
 
-            // Do all processing before updating
-            for (GenericSprite s : _sprites) {
+        // Do all processing before updating
+        for (GenericSprite s : _sprites) {
 
-                for (GenericSprite t : _sprites){
-                    if (t != s) {
-                        if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s)) {
+            for (GenericSprite t : _sprites) {
+                if (t != s) {
+                    if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s)) {
 
-                            ((IBouncable) t).bounceFrom(s);
+                        ((IBouncable) t).bounceFrom(s);
 
-                        } else if (t instanceof FinishSprite && s instanceof PlayerSprite) {
-                            if (t.isCollidedWith(s)){
-                                _state = State.Spectating;
-                                addScore(1);
-                            }
-                        } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
-                            if (t.isCollidedWith(s)) {
-                                _state = State.Spectating;
-                            }
+                    } else if (t instanceof FinishSprite && s instanceof PlayerSprite) {
+                        if (t.isCollidedWith(s)) {
+                            _state = State.Spectating;
+                            addScore(1);
+                        }
+                    } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
+                        if (t.isCollidedWith(s)) {
+                            _state = State.Spectating;
                         }
                     }
                 }
             }
+        }
 
-            for (GenericSprite s : _sprites) {
-                if (s instanceof PlayerSprite && _state == State.Spectating) {
-                    continue;
-                }
-                s.update(this);
+        for (GenericSprite s : _sprites) {
+            if (s instanceof PlayerSprite && _state == State.Spectating) {
+                continue;
             }
+            s.update(this);
         }
     }
 
@@ -276,6 +248,7 @@ public class GameState {
 
     /**
      * Generates a level in the form of a GameState object
+     *
      * @param l Level to generate
      * @param c Context. Used to get resources
      * @return A new level
@@ -293,7 +266,7 @@ public class GameState {
             sprites.add(new WallSprite(0, levelY, levelX, 1));
             sprites.add(new WallSprite(levelX, 0, 1, levelY));
 
-            for (int i=0; i<5; i++) {
+            for (int i = 0; i < 5; i++) {
 
                 // _state.getViewSize()[1]
                 //_state.getViewSize()[0]
@@ -302,12 +275,12 @@ public class GameState {
                 int width = GameState.RANDOM.nextInt(levelX - left) + 1;
                 int height = GameState.RANDOM.nextInt(levelY - top) + 1;
 
-                WallSprite wallSprite = new WallSprite(left, top , width, height);
+                WallSprite wallSprite = new WallSprite(left, top, width, height);
                 sprites.add(wallSprite);
 
             }
 
-            for (int i=0; i<5; i++) {
+            for (int i = 0; i < 5; i++) {
 
                 int left = GameState.RANDOM.nextInt(levelX - 1) + 1;
                 int top = GameState.RANDOM.nextInt(levelY - 1) + 1;
@@ -358,7 +331,7 @@ public class GameState {
             sprites.add(new WallSprite(-1, 0, 1, 10));
             sprites.add(new WallSprite(0, 10, 10, 1));
             sprites.add(new WallSprite(10, 0, 1, 10));
-            return new GameState(c.getString(R.string.level_empty), new Point(10,10), new PointF(5, 5), sprites);
+            return new GameState(c.getString(R.string.level_empty), new Point(10, 10), new PointF(5, 5), sprites);
         } else if (l == Level.LevelOne) {
             List<GenericSprite> sprites = new ArrayList<GenericSprite>();
 
@@ -418,6 +391,7 @@ public class GameState {
 
     /**
      * Gets the GameState.Level that corresponds to the given string
+     *
      * @param name String representation of the level name
      * @return Requested GameState.Level
      */
