@@ -49,7 +49,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private boolean debug = false;
     private boolean debugButtons = false;
 
-    private boolean _startGame = false;
     private boolean _amReady = false;
     private boolean _othersReady = true;
 
@@ -210,22 +209,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Principle of game design
         // Stops things going wrong when FPS forced to different values
 
-        if (_startGame && _amReady && _othersReady) {
+        if (_amReady && _othersReady) {
 
-            // Get a GameState.Level from intent system
-            GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
-            if (levelNum == null)
-                levelNum = GameState.Level.Random;
-            // Save state
-            _state = GameState.GENERATE(levelNum, this);
-
-            _view.setState(_state);
-
-            // Force recalcualtion of view positions
-            _view.setVisibility(View.GONE);
-            _view.setVisibility(View.VISIBLE);
-
-            _startGame = false;// Forces this condition to only be true once
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startLevel();
+                }
+            });
         }
 
         synchronized (_state) {
@@ -240,6 +231,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 finish();
             }
         }
+    }
+
+    public void startLevel() {
+
+        // Get a GameState.Level from intent system
+        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
+        if (levelNum == null)
+            levelNum = GameState.Level.Random;
+        // Save state
+        _state = GameState.GENERATE(levelNum, this);
+
+        _view.setState(_state);
+
+        _amReady = false;// Forces this condition to only be true once
+        //Force recalcualtion of view positions
+        _view.setVisibility(View.GONE);
+        _view.setVisibility(View.VISIBLE);
+
+        findViewById(R.id.gameButton).setVisibility(View.GONE);
     }
 
 
@@ -498,6 +508,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 _othersReady = true;
                             break;
                         case 104:
+                            otherPlayers.remove(otherAddress);
                             break;
                         default:
                             Log.e("Net", "Unknown code " + statusCode + " received with message " + event);
@@ -519,7 +530,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
          * Big thanks to http://stackoverflow.com/questions/6064510/how-to-get-ip-address-of-the-device
          * for this. I wouldn't have been able to figure it out myself.
          * Get IP address from first non-localhost interface
-         * @return  address or empty string
+         *
+         * @return address or empty string
          */
         public String getIPAddress() {
             try {
@@ -529,14 +541,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     for (InetAddress addr : addrs) {
                         if (!addr.isLoopbackAddress()) {
                             String sAddr = addr.getHostAddress().toUpperCase();
-                                if (sAddr.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"))
-                                    return sAddr;
+                            if (sAddr.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"))
+                                return sAddr;
                         }
                     }
                 }
-            } catch (Exception ex) { } // for now eat exceptions
+            } catch (Exception ex) {
+            } // for now eat exceptions
             return null;
         }
 
+        public void stopTimer() {
+            _netTimer.cancel();
+        }
     }
 }
