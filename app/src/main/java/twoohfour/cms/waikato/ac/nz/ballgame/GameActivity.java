@@ -375,9 +375,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private class NetThread extends Thread implements MultiplayerEventListener {
 
         private MultiplayerNetwork _network;
-        private InetAddress _server;
-        private boolean _iAmServer;
-        private final static int othersNetworkResponseTime = 200;
         private String _myIP;
         private InetAddress _myInet;
         private Timer _netTimer;
@@ -387,13 +384,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public void run() {
 
+            // String is the ip
+            otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
 
-            synchronized (new Boolean(_isHost)) {
-                _iAmServer = _isHost;
-            }
-
-
-            // Get my IP Address:
             try {
                 _myIP = InetAddress.getLocalHost().getHostAddress();
                 _myInet = InetAddress.getLocalHost();
@@ -402,42 +395,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 finish();
             }
 
-            // Set the level to 0
-            _level = "";
-
-            // String is the ip
-            otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
-
             _network = new MultiplayerNetwork();
             _network.registerListener(this);
-
-            // Establish who is server;
-            if (!_iAmServer) {
-                _network.sendCode(300, "");
-            }
-
-
-            if (_iAmServer) {
-                _server = _myInet;
-            }
-
-            long loop = 0;
-
-            while (loop < 600000000) {
-                loop = loop + 1;
-            }
-
-            if (_server == null) {
-                //_server = _myInet;
-                //_iAmServer = true;
-                //System.out.println("Starting me as server....");
-                //_network.sendCode(301, "");
-                //_network.sendCode(301, "");
-
-                Log.e("Networking", "Unable to commincated with server");
-                finish();
-            }
-
 
             // Start update loop
             _netTimer = new Timer("Network");
