@@ -38,7 +38,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Game"
+        android:text="@string/mp_ready"
         android:id="@+id/buttonStartGame"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"

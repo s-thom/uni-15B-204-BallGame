@@ -1,5 +1,7 @@
 package twoohfour.cms.waikato.ac.nz.ballgame;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -44,10 +46,10 @@ public class MultiplayerNetwork {
                         DatagramPacket recv = new DatagramPacket(buffer, buffer.length);
                         ms.receive(recv);
                         String message = new String(buffer, "UTF-8");
-                        System.out.println(recv.getAddress() + " : " + message);
+                        //Log.i("NetIn", recv.getAddress() + " : " + message);
 
                         int statusCode = Integer.parseInt(message.split("\\s+")[0]);
-                        String params = message.split("\\s(.*)")[0];
+                        String params = message.split("\\s+")[1];
 
                         for ( MultiplayerEventListener mel : _listeners ) {
                             mel.message(statusCode, params, recv.getAddress());
@@ -73,6 +75,10 @@ public class MultiplayerNetwork {
 
     public void registerListener(MultiplayerEventListener m) {
         _listeners.add(m);
+    }
+
+    public void unregisterListener(MultiplayerEventListener m) {
+        _listeners.remove(m);
     }
 
     public void sendCode(int code, String vars) {

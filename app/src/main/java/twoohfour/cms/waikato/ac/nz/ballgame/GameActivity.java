@@ -10,9 +10,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,26 +25,34 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class GameActivity extends AppCompatActivity implements SensorEventListener, MultiplayerEventListener {
+public class GameActivity extends AppCompatActivity implements SensorEventListener {
 
     //region Variables
     public static final String EXTRA_SCORE = "nz.ac.waikato.cms.twohofour.ballgame.SCORE";
     public static final String EXTRA_LEVEL = "nz.ac.waikato.cms.twohofour.ballgame.LEVEL";
 
     private SensorManager sensorManager;
+    private MultiplayerNetwork _network;
     private Sensor accel;
     private boolean debug = false;
     private boolean debugButtons = false;
+
+    private boolean _amReady = false;
+    private boolean _othersReady = true;
+
 
     private final float MAX_GRAVITY = 4.5f; // Tilting the device past this point will have no effect
     private final int UPDATES_PER_SECOND = 30;
@@ -49,20 +60,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private final float SENSOR_THRESHOLD = 0.2f;
     private float sensitivity;
     private final float SPEED = 0.001f; // A constant to affect acceleration
-                                    // Unlike sensitivity, this is constant, not set by the user
+    // Unlike sensitivity, this is constant, not set by the user
     private DrawableView _view;
     private GameState _state;
     private Timer _updateTimer;
-
-
-
-
-    private MultiplayerNetwork _network;
-    private InetAddress _server;
-    private boolean _iAmServer;
-    private final static int othersNetworkResponseTime = 200;
-    private String _myIP;
-    private InetAddress _myInet;
 
     private int _timeToStart;
     // Used to hold the level before it starts/cahnges
@@ -70,6 +71,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private Hashtable otherPlayers;
 
+    private NetThread _netThread;
+
+    private boolean _isMp;
 
     //endregion
 
@@ -77,6 +81,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     /**
      * Initialises the GameActivity
+     *
      * @param savedInstanceState Saved state
      */
     @Override
@@ -87,7 +92,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         retrievePreferences();
 
         // Get the accelerometer
-        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         // Try hide the action bar
@@ -98,72 +103,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
 
 
-
-
-
-
-
-
-
-        // Get my IP Address:
-        try {
-            _myIP = InetAddress.getLocalHost().getHostAddress();
-            _myInet = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            // TODO: Implement nicer error message
-            finish();
-        }
-
-        // Set the level to 0
-        _level = "";
-
-        // String is the ip
-        otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
-
-        _network = new MultiplayerNetwork();
-
-        _iAmServer = false;
-        _server = null;
-        // Establish who is server;
-        _network.sendCode(300, "");
-        try {
-            wait(othersNetworkResponseTime);
-        } catch (InterruptedException e) {
-            // Doesn't matter.
-            System.err.println("Didn't wait full time");
-        }
-
-        if (_server == null) {
-            _server = _myInet;
-            _iAmServer = true;
-            System.out.println("Starting me as server....");
-            _network.sendCode(301, "");
-            _network.sendCode(301, "");
-        }
-
-
-
-
-
-
-
-        // Messy code to get a GameState.Level from an int passed through the intent system
-        GameState.Level levelNum = GameState.Level.Empty;
-        _state = GameState.GENERATE(levelNum, this);
-
-
-
-
-
-
-        // Start update loop
-        _updateTimer = new Timer("Update");
-        _updateTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                doUpdate();
-            }
-        }, 0, 1000 / UPDATES_PER_SECOND);
     }
 
     /**
@@ -178,26 +117,50 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         retrievePreferences();
 
+        // String is the ip
+        otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
+
         // Set layouts
         setContentView(R.layout.activity_game);
 
         // Set drawable view state
-        _view = (DrawableView)findViewById(R.id.draw_view);
+
+        _view = (DrawableView) findViewById(R.id.draw_view);
+
+        if (_isMp) {
+            // Messy code to get a GameState.Level from an int passed through the intent system
+            GameState.Level levelNum = GameState.Level.Empty;
+            _state = GameState.GENERATE(levelNum, this);
+        } else {
+            startLevel();
+        }
         _view.setState(_state);
 
         if (debug) {
-            ViewStub s = (ViewStub)findViewById(R.id.debug_stub);
-            LinearLayout debugLayout = (LinearLayout)s.inflate();
+            ViewStub s = (ViewStub) findViewById(R.id.debug_stub);
+            LinearLayout debugLayout = (LinearLayout) s.inflate();
 
             if (debugButtons) {
-                ViewStub vs = (ViewStub)findViewById(R.id.debug_buttons_stub);
-                GridLayout debugButtonsLayout = (GridLayout)vs.inflate();
+                ViewStub vs = (ViewStub) findViewById(R.id.debug_buttons_stub);
+                GridLayout debugButtonsLayout = (GridLayout) vs.inflate();
             }
         }
-        
-        TextView levelLabel = (TextView)findViewById(R.id.level_name);
+
+        TextView levelLabel = (TextView) findViewById(R.id.level_name);
         levelLabel.setText(_state.getTitle());
 
+        // Start update loop
+        _updateTimer = new Timer("Update");
+        _updateTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                doUpdate();
+            }
+        }, 0, 1000 / UPDATES_PER_SECOND);
+
+
+        _netThread = new NetThread();
+        _netThread.start();
     }
 
     /**
@@ -209,7 +172,24 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         // Unregister accelerometer
         sensorManager.unregisterListener(this);
+
+        _network.unregisterListener(_netThread);
+        _updateTimer.cancel();
+        _netThread.stopTimer();
+        _netThread = null;
+
+        Thread quick = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                _network.sendCode(104, "");
+            }
+        });
+        quick.start();
+
+        finish();
     }
+
+
     //endregion
 
     /**
@@ -219,6 +199,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Get sensitivity value
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String sensPref = sharedPref.getString(getResources().getString(R.string.key_pref_sensitivity), getResources().getString(R.string.pref_sensitivity_default_value));
+
+        _isMp = sharedPref.getBoolean(getResources().getString(R.string.key_pref_mp), true);
+
         debug = sharedPref.getBoolean(getResources().getString(R.string.key_pref_debug), false);
         if (debug)
             debugButtons = sharedPref.getBoolean(getResources().getString(R.string.key_pref_debug_buttons), false);
@@ -232,6 +215,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //region Main code
+
     /**
      * Update loop
      * Handles all updating of the game
@@ -242,15 +226,54 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Principle of game design
         // Stops things going wrong when FPS forced to different values
 
-        _state.update();
+        if (_amReady && _othersReady) {
 
-        if (_state.isComplete()) {
-            Intent i = new Intent();
-            i.putExtra(EXTRA_SCORE, _state.getScore());
-
-            setResult(RESULT_OK, i);
-            finish();
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    startLevel();
+                }
+            });
         }
+
+        //Log.i("othersready", new Boolean(_othersReady).toString());
+
+        synchronized (_state) {
+            _state.update();
+            GameState.State _mode = _state.getState();
+
+            if (_mode == GameState.State.Spectating) {
+                Intent i = new Intent();
+                i.putExtra(EXTRA_SCORE, _state.getScore());
+
+                setResult(RESULT_OK, i);
+                finish();
+            }
+        }
+    }
+
+    public void startLevel() {
+
+        // Get a GameState.Level from intent system
+        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
+        if (levelNum == null)
+            levelNum = GameState.Level.Random;
+        // Save state
+        _state = GameState.GENERATE(levelNum, this);
+
+        List<GenericSprite> spriteList = _state.getSprites();
+        for(Object s : otherPlayers.values()) {
+            spriteList.add((GenericSprite)s);
+        }
+
+        _view.setState(_state);
+
+        _amReady = false;// Forces this condition to only be true once
+        //Force recalcualtion of view positions
+        _view.setVisibility(View.GONE);
+        _view.setVisibility(View.VISIBLE);
+
+        findViewById(R.id.buttonStartGame).setVisibility(View.GONE);
     }
 
 
@@ -261,7 +284,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         float gravChangeFactor = 0.05f;
 
         int id = button.getId();
-        float[] currGrav = _state.getGravity();
+
+        float[] currGrav;
+        synchronized (_state) {
+            currGrav = _state.getGravity();
+        }
+
         if (id == R.id.button_grav_up)
             currGrav[1] -= gravChangeFactor;
         else if (id == R.id.button_grav_down)
@@ -271,7 +299,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         else if (id == R.id.button_grav_right)
             currGrav[0] += gravChangeFactor;
 
-        _state.setGravity(currGrav[0], currGrav[1], currGrav[2]);
+        synchronized (_state) {
+            _state.setGravity(currGrav[0], currGrav[1], currGrav[2]);
+        }
     }
     //endregion
 
@@ -279,6 +309,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     /**
      * Accelerometer changed
+     *
      * @param sensorEvent Event fired
      */
     @Override
@@ -318,15 +349,20 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 gravY = gravY * SPEED * sensitivity;
                 gravZ = gravZ * SPEED * sensitivity;
             } else {
-                float[] gravValues = _state.getGravity();
+                float[] gravValues;
+                synchronized (_state) {
+                    gravValues = _state.getGravity();
+                }
 
                 gravX = gravValues[0];
                 gravY = gravValues[1];
                 gravZ = gravValues[2];
             }
 
-            // Store gravity values
-            _state.setGravity(gravX, gravY, gravZ);
+            synchronized (_state) {
+                // Store gravity values
+                _state.setGravity(gravX, gravY, gravZ);
+            }
 
 
             if (debug) {
@@ -347,29 +383,96 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 TextView pdx = (TextView) findViewById(R.id.player_dx);
                 TextView pdy = (TextView) findViewById(R.id.player_dy);
                 // Set text
-                PlayerSprite player = _state.getPlayer();
-                px.setText("x: " + player.getXPos());
-                py.setText("y: " + player.getYPos());
-                pdx.setText("dx: " + player.getMotion().x);
-                pdy.setText("dy: " + player.getMotion().y);
+                synchronized (_state) {
+                    PlayerSprite player = _state.getPlayer();
+                    px.setText("x: " + player.getXPos());
+                    py.setText("y: " + player.getYPos());
+                    pdx.setText("dx: " + player.getMotion().x);
+                    pdy.setText("dy: " + player.getMotion().y);
+                }
             }
         }
     }
 
 
-
+    /**
+     * Sensor accuracy changed
+     * Currently unused
+     *
+     * @param sensor ID of sensor that changed
+     * @param i      New accuracy value
+     */
     @Override
-    public void onNetworkError(Exception e, String text) {
-        // Handle Errors
-        // TODO:  Implement nice error checking for various errors on Network.
-        System.err.println(e.getMessage() + " " + text);
-        finish();
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
+    //endregion
+
+    public void onStartGameButton(View button) {
+        button.setEnabled(false);
+        _amReady = true;
+
+        Thread quick = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                _network.sendCode(103, "");
+            }
+        });
+
+        quick.start();
     }
 
+    private class NetThread extends Thread implements MultiplayerEventListener {
 
+        private String _myIP;
+        private InetAddress _myInet;
+        private Timer _netTimer;
 
-    @Override
-    public void message(int statusCode, String event, InetAddress from) {
+        private final int NETWORK_UPDATES_PER_SECOND = 20;
+
+        @Override
+        public void run() {
+            try {
+
+                _myIP = getIPAddress();
+                if (_myIP == null)
+                    _myIP = InetAddress.getLocalHost().getHostAddress();
+                _myInet = InetAddress.getLocalHost();
+            } catch (UnknownHostException e) {
+                // TODO: Implement nicer error message
+                finish();
+            }
+
+            _network = new MultiplayerNetwork();
+            _network.registerListener(this);
+
+            // Start update loop
+            _netTimer = new Timer("Network");
+            _netTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (_state) {
+                        PlayerSprite player = _state.getPlayer();
+                        synchronized (_network) {
+                            _network.sendCode(102, player.getXPos() + "," + player.getYPos());
+                        }
+                    }
+
+                }
+            }, 0, 1000 / NETWORK_UPDATES_PER_SECOND);
+
+        }
+
+        @Override
+        public void onNetworkError(Exception e, String text) {
+            // Handle Errors
+            // TODO:  Implement nice error checking for various errors on Network.
+            System.err.println(e.getMessage() + " " + text);
+            finish();
+        }
+
+        @Override
+        public void message(int statusCode, String event, InetAddress from) {
 
         /*
 
@@ -385,120 +488,113 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         | 202 <ip,playername> | Game Over, announcing winner       |
         | 102 <x,y>           | Update Location of Client.         |
 
+        *//*
+        THE STUART TABLE
+
+        | Code                | Description                        |
+        |---------------------|------------------------------------|
+        | 102 <x,y>           | Update Location of Client.         |
+        | 103                 | I am ready                         |
+        | 104                 | I am leaving                       |
+
         */
+            synchronized (otherPlayers) {
+                String otherAddress = from.getHostAddress();
+                if (!otherAddress.equals(_myIP)) {
 
-        // Code 300:
-        if (statusCode == 300) {
-            if (_iAmServer) {
-                _network.sendCode(301,"");
-            }
+                    if (!otherPlayers.containsKey(otherAddress)) {
+                        addPlayerToHashtable(otherAddress);
+                        _othersReady = false;
+                    }
+                    MultiPlayerGhostSprite s = (MultiPlayerGhostSprite) otherPlayers.get(otherAddress);
 
-        } else if (statusCode == 301) {
-            // Code 301:  I am server
-            if (_server == null) {
-                _server = from;
-            }
+                    switch (statusCode) {
+                        case 102:
+                            String[] messageSplit = event.split(",");
+                            float[] posArray = new float[2];
+                            try {
+                                posArray[0] = Float.parseFloat(messageSplit[0]);
+                                posArray[1] = Float.parseFloat(messageSplit[1]);
+                            } catch (Exception ex) {
+                                posArray[0] = 0;
+                                posArray[1] = 0;
+                            }
 
-        } else if (statusCode == 100) {
-            // Code 100 <playername> - Player joining game
-            if (_iAmServer) {
-                // Add them to list of players:
-                if (!otherPlayers.containsKey(from.getHostAddress())) {
+                            s.setXPos(posArray[0]);
+                            s.setYPos(posArray[1]);
+                            break;
+                        case 103:
+                            s.setReady();
 
-                    MultiPlayerGhostSprite other = new MultiPlayerGhostSprite(0,0);
-                    otherPlayers.put(from.getHostAddress(), other);
-                    _state.getSprites().add(other);
+                            boolean tempReady = true;
+                            for (Object sprite : otherPlayers.values()) {
+                                if (!((MultiPlayerGhostSprite) sprite).isReady()) {
+                                    tempReady = false;
+                                    break;
+                                }
+                            }
+                            if (tempReady)
+                                _othersReady = true;
+                            break;
+                        case 104:
+                            otherPlayers.remove(otherAddress);
+                            synchronized (_state) {
+                                _state.getSprites().remove(s);
+                            }
 
-                    // Accepting them.
-                    _network.sendCode(101, from.getHostAddress() );
-
-                } else {
-                    // This is weird, since the other player is already in our list, but they don't think they are.
-                    // Shouldn't really happen ever.
-                    // TODO: Implement a method to handle this.
-
+                            boolean maybeReady = true;
+                            for (Object sprite : otherPlayers.values()) {
+                                if (!((MultiPlayerGhostSprite) sprite).isReady()) {
+                                    maybeReady = false;
+                                    break;
+                                }
+                            }
+                            if (maybeReady)
+                                _othersReady = true;
+                            break;
+                        default:
+                            Log.e("Net", "Unknown code " + statusCode + " received with message " + event);
+                            break;
+                    }
                 }
-
             }
-        } else if (statusCode == 101) {
-            // Code 101 <ip> - Player has been accepted into game
-            if (!_iAmServer && event == _myIP) {
-                // I have been accepted into the game!
-
-                // TODO:  Start my crusing around the game lobby
-            } else if (!_iAmServer) {
-                // Add them into our list of sprites
-                otherPlayers.put(from.getHostAddress(), new MultiPlayerGhostSprite(0,0));
-            }
-        } else if (statusCode == 102) {
-            // Player is in game
-            if (!otherPlayers.containsKey(from.getHostAddress())) {
-                // Whoops, we have found a new player who isn't in our list.
-                MultiPlayerGhostSprite newSprite =  new MultiPlayerGhostSprite(0,0);
-
-                otherPlayers.put(from.getHostAddress(), newSprite);
-
-                _state.getSprites().add(newSprite);
-
-                if (_iAmServer) {
-                    // Broadcast and let everyone know about the player
-                    _network.sendCode(101, from.getHostAddress());
-                }
-            }
-
-            // Code 200 <level> - Level is about to start
-        } else if (statusCode == 200) {
-            _level = event;
-
-
-        } else if (statusCode == 201) {
-            // Code 201 <time> - Time till game starts
-            TextView counter = (TextView) findViewById(R.id.level_name);
-            counter.setText(event);
-            _timeToStart = Integer.parseInt(event);
-
-            if (_timeToStart == 0) {
-
-                // Game Started
-                // TODO:  Make game start
-            }
-
-        } else if (statusCode == 202) {
-            // Code 202 <ip,playername> - Game Over, announcing winner
-
-        } else if (statusCode == 102) {
-            // Code 102 <x,y> update location of player
-            MultiPlayerGhostSprite update = (MultiPlayerGhostSprite)otherPlayers.get(from.getHostAddress());
-            update.setXPos(Float.parseFloat(event.split(",")[0]));
-            update.setXPos(Float.parseFloat(event.split(",")[1]));
-
         }
-    }
 
+        private void addPlayerToHashtable(String address) {
+            MultiPlayerGhostSprite newSprite = new MultiPlayerGhostSprite(0, 0);
+            otherPlayers.put(address, newSprite);
+            synchronized (_state) {
+                _state.getSprites().add(newSprite);
+            }
+        }
 
+        /**
+         * Big thanks to http://stackoverflow.com/questions/6064510/how-to-get-ip-address-of-the-device
+         * for this. I wouldn't have been able to figure it out myself.
+         * Get IP address from first non-localhost interface
+         *
+         * @return address or empty string
+         */
+        public String getIPAddress() {
+            try {
+                List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+                for (NetworkInterface intf : interfaces) {
+                    List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                    for (InetAddress addr : addrs) {
+                        if (!addr.isLoopbackAddress()) {
+                            String sAddr = addr.getHostAddress().toUpperCase();
+                            if (sAddr.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"))
+                                return sAddr;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+            } // for now eat exceptions
+            return null;
+        }
 
-    /**
-     * Sensor accuracy changed
-     * Currently unused
-     * @param sensor ID of sensor that changed
-     * @param i New accuracy value
-     */
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-    //endregion
-
-    public void onStartGameButton(View button) {
-
-        // Messy code to get a GameState.Level from an int passed through the intent system
-        GameState.Level levelNum = (GameState.Level) getIntent().getSerializableExtra(EXTRA_LEVEL);
-        if (levelNum == null)
-            levelNum = GameState.Level.Random;
-        // Save state
-        _state = GameState.GENERATE(levelNum, this);
-
-
-
+        public void stopTimer() {
+            _netTimer.cancel();
+        }
     }
 }
