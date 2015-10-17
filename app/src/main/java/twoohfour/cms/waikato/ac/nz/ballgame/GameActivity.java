@@ -10,9 +10,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,8 +27,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
@@ -45,7 +49,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private boolean _startGame = false;
     private boolean _amReady = false;
-    private boolean _othersReady = false;
+    private boolean _othersReady = true;
 
 
     private final float MAX_GRAVITY = 4.5f; // Tilting the device past this point will have no effect
@@ -388,7 +392,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             otherPlayers = new Hashtable<String, MultiPlayerGhostSprite>();
 
             try {
-                _myIP = InetAddress.getLocalHost().getHostAddress();
+
+                _myIP = getIPAddress();
+                Log.w("nettest", _myIP);
+                if (_myIP == null)
+                    _myIP = InetAddress.getLocalHost().getHostAddress();
+                Log.w("nettest", _myIP);
                 _myInet = InetAddress.getLocalHost();
             } catch (UnknownHostException e) {
                 // TODO: Implement nicer error message
@@ -450,7 +459,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         */
             synchronized (otherPlayers) {
                 String otherAddress = from.getHostAddress();
-                if (otherAddress != _myIP) {
+                if (!otherAddress.equals(_myIP)) {
 
                     if (!otherPlayers.containsKey(otherAddress)) {
                         addPlayerToHashtable(otherAddress);
@@ -471,6 +480,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                             s.setXPos(posArray[0]);
                             s.setYPos(posArray[1]);
+                            _othersReady = false;
                             break;
                         case 103:
                             s.setReady();
@@ -488,7 +498,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         case 104:
                             break;
                         default:
-                            Log.w("Net", "Unknown code " + statusCode + " recieved with message " + event);
+                            Log.e("Net", "Unknown code " + statusCode + " received with message " + event);
                             break;
                     }
                 }
@@ -501,6 +511,29 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             synchronized (_state) {
                 _state.getSprites().add(newSprite);
             }
+        }
+
+        /**
+         * Big thanks to http://stackoverflow.com/questions/6064510/how-to-get-ip-address-of-the-device
+         * for this. I wouldn't have been able to figure it out myself.
+         * Get IP address from first non-localhost interface
+         * @return  address or empty string
+         */
+        public String getIPAddress() {
+            try {
+                List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+                for (NetworkInterface intf : interfaces) {
+                    List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                    for (InetAddress addr : addrs) {
+                        if (!addr.isLoopbackAddress()) {
+                            String sAddr = addr.getHostAddress().toUpperCase();
+                                if (sAddr.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"))
+                                    return sAddr;
+                        }
+                    }
+                }
+            } catch (Exception ex) { } // for now eat exceptions
+            return null;
         }
 
     }

@@ -22,6 +22,7 @@ public class MultiPlayerGhostSprite extends GenericSprite {
     public MultiPlayerGhostSprite(float x, float y, float weight) {
         super(x, y, 0.5f, 0.5f, weight);
         _paint.setColor(Color.RED);
+        _paint.setAlpha(128);
     }
 
     public boolean isReady() {
