@@ -15,6 +15,7 @@
         <item>@string/level_scrolling</item>
         <item>@string/level_happy</item>
         <item>@string/level_death</item>
+        <item>@string/level_maze</item>
         <item>@string/level_random</item>
     </string-array>
 </resources>

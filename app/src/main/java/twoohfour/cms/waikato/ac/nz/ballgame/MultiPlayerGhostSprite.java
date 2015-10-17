@@ -8,6 +8,9 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Tim on 11/10/2015.
  */
@@ -15,13 +18,24 @@ public class MultiPlayerGhostSprite extends GenericSprite {
 
     boolean _ready = false;
 
+    private static final int[] COLORS = new int[]{
+            Color.BLUE,
+            Color.CYAN,
+            Color.GREEN,
+            Color.MAGENTA,
+            Color.RED,
+            Color.YELLOW
+    };
+
     public MultiPlayerGhostSprite(float x, float y) {
         this(x, y, 1);
     }
 
     public MultiPlayerGhostSprite(float x, float y, float weight) {
         super(x, y, 0.5f, 0.5f, weight);
-        _paint.setColor(Color.RED);
+
+        int colorIndex = GameState.RANDOM.nextInt(COLORS.length);
+        _paint.setColor(COLORS[colorIndex]);
         _paint.setAlpha(128);
     }
 

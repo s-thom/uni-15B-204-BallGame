@@ -35,6 +35,7 @@ public class DrawableView extends View {
 
     /**
      * Stores a reference to the game's state
+     *
      * @param s State to hold
      */
     public void setState(GameState s) {
@@ -42,20 +43,19 @@ public class DrawableView extends View {
         s.setView(this);
 
         Point levelSize = s.getLevelSize();
-        _hwRatio = (float)levelSize.y / (float)levelSize.x;
+        _hwRatio = (float) levelSize.y / (float) levelSize.x;
     }
 
     /**
      * Draws all sprites
+     *
      * @param canvas Canvas to draw sprites on
      */
     @Override
     protected void onDraw(Canvas canvas) {
         if (_state != null) {
-            if (_state.isReady()) {
-                _state.draw(canvas, _viewStateRatio);
-                invalidate(); // Add another draw routine to the event stack
-            }
+            _state.draw(canvas, _viewStateRatio);
+            invalidate(); // Add another draw routine to the event stack
 
         }
 
@@ -64,7 +64,8 @@ public class DrawableView extends View {
     /**
      * Sets the height / width of the view
      * In this case, makes the height = HEIGHT_WIDTH_RATIO * width
-     * @param widthMeasureSpec Key to get information about the width of this View
+     *
+     * @param widthMeasureSpec  Key to get information about the width of this View
      * @param heightMeasureSpec Key to get information about the height of this View
      */
     @Override
@@ -82,9 +83,9 @@ public class DrawableView extends View {
         int newHeight = height;
 
         if (width * _hwRatio > height)
-            newWidth = (int)(height / _hwRatio);
+            newWidth = (int) (height / _hwRatio);
         else
-            newHeight = (int)(width * _hwRatio);
+            newHeight = (int) (width * _hwRatio);
 
         // Add width constraints
         if (widthMode == MeasureSpec.EXACTLY)
@@ -104,7 +105,7 @@ public class DrawableView extends View {
 
 
         Point levelSize = _state.getLevelSize();
-        _viewStateRatio = (float)newWidth / (float)levelSize.x;
+        _viewStateRatio = (float) newWidth / (float) levelSize.x;
         //_state.setViewSize(newWidth, newHeight);
         setMeasuredDimension(newWidth, newHeight);
     }
