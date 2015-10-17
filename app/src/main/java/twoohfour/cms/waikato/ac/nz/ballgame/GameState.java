@@ -32,7 +32,7 @@ public class GameState {
 
     public enum State {Waiting, Playing, Spectating}
 
-    public enum Level {Random, Scrolling, Empty, LevelOne, Death, Happy}
+    public enum Level {Random, Scrolling, Empty, LevelOne, Death, Happy, Maze}
     //endregion
 
     public final static Random RANDOM = new Random();
@@ -208,6 +208,7 @@ public class GameState {
         _ticks++;
 
         // Do all processing before updating
+        List<GenericSprite> toRemove = new ArrayList<GenericSprite>();
         for (GenericSprite s : _sprites) {
 
             for (GenericSprite t : _sprites) {
@@ -227,12 +228,15 @@ public class GameState {
                         }
                     } else if (t instanceof DisappearingWallSprite && s instanceof PlayerSprite) {
                         if (t.isCollidedWith(s)) {
-                            _sprites.remove(t);
+                            toRemove.add(t);
                         }
                     }
                 }
             }
         }
+
+        for (GenericSprite s : toRemove)
+            _sprites.remove(s);
 
         for (GenericSprite s : _sprites) {
             if (s instanceof PlayerSprite && _state == State.Spectating) {
@@ -388,6 +392,251 @@ public class GameState {
             sprites.add(new WallSprite(1, 2, 2, 1));
 
             return new GameState(c.getString(R.string.level_happy), new Point(5, 5), new PointF(1.25f, 3.25f), sprites);
+        } else if (l == Level.Maze) {
+            List<GenericSprite> sprites = new ArrayList<GenericSprite>();
+
+            FinishSprite fs = new FinishSprite(5, 17, 1, 1);
+            sprites.add(fs);
+
+            //region LONG LIST OF SPRITES; KEEP COLLAPSED
+            sprites.add(new WallSprite(0, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 2, 1, 1));
+            sprites.add(new WallSprite(0, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 4, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 7, 1, 1));
+            sprites.add(new WallSprite(0, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 10, 1, 1));
+            sprites.add(new WallSprite(0, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 13, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 15, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 16, 1, 1));
+            sprites.add(new WallSprite(0, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(0, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 2, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 4, 1, 1));
+            sprites.add(new WallSprite(1, 5, 1, 1));
+            sprites.add(new WallSprite(1, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 8, 1, 1));
+            sprites.add(new WallSprite(1, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 12, 1, 1));
+            sprites.add(new WallSprite(1, 13, 1, 1));
+            sprites.add(new WallSprite(1, 14, 1, 1));
+            sprites.add(new WallSprite(1, 15, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 18, 1, 1));
+            sprites.add(new WallSprite(1, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(1, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 0, 1, 1));
+            sprites.add(new WallSprite(2, 1, 1, 1));
+            sprites.add(new WallSprite(2, 2, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 3, 1, 1));
+            sprites.add(new WallSprite(2, 4, 1, 1));
+            sprites.add(new WallSprite(2, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 6, 1, 1));
+            sprites.add(new WallSprite(2, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 10, 1, 1));
+            sprites.add(new WallSprite(2, 11, 1, 1));
+            sprites.add(new WallSprite(2, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 13, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 15, 1, 1));
+            sprites.add(new WallSprite(2, 16, 1, 1));
+            sprites.add(new WallSprite(2, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(2, 19, 1, 1));
+            sprites.add(new WallSprite(2, 20, 1, 1));
+            sprites.add(new WallSprite(3, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 2, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 3, 1, 1));
+            sprites.add(new WallSprite(3, 4, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 7, 1, 1));
+            sprites.add(new WallSprite(3, 8, 1, 1));
+            sprites.add(new WallSprite(3, 9, 1, 1));
+            sprites.add(new WallSprite(3, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 13, 1, 1));
+            sprites.add(new WallSprite(3, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 15, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 17, 1, 1));
+            sprites.add(new WallSprite(3, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(3, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 1, 1, 1));
+            sprites.add(new WallSprite(4, 2, 1, 1));
+            sprites.add(new WallSprite(4, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 4, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 5, 1, 1));
+            sprites.add(new WallSprite(4, 6, 1, 1));
+            sprites.add(new WallSprite(4, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 11, 1, 1));
+            sprites.add(new WallSprite(4, 12, 1, 1));
+            sprites.add(new WallSprite(4, 13, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 15, 1, 1));
+            sprites.add(new WallSprite(4, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 18, 1, 1));
+            sprites.add(new WallSprite(4, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(4, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 0, 1, 1));
+            sprites.add(new WallSprite(5, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 2, 1, 1));
+            sprites.add(new WallSprite(5, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 4, 1, 1));
+            sprites.add(new WallSprite(5, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 8, 1, 1));
+            sprites.add(new WallSprite(5, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 10, 1, 1));
+            sprites.add(new WallSprite(5, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 13, 1, 1));
+            sprites.add(new WallSprite(5, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 15, 1, 1));
+            sprites.add(new WallSprite(5, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 17, 1, 1));
+            sprites.add(new WallSprite(5, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(5, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 2, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 4, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 6, 1, 1));
+            sprites.add(new WallSprite(6, 7, 1, 1));
+            sprites.add(new WallSprite(6, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 11, 1, 1));
+            sprites.add(new WallSprite(6, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 13, 1, 1));
+            sprites.add(new WallSprite(6, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 15, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 16, 1, 1));
+            sprites.add(new WallSprite(6, 17, 1, 1));
+            sprites.add(new WallSprite(6, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(6, 19, 1, 1));
+            sprites.add(new WallSprite(6, 20, 1, 1));
+            sprites.add(new WallSprite(7, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 2, 1, 1));
+            sprites.add(new WallSprite(7, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 4, 1, 1));
+            sprites.add(new WallSprite(7, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 9, 1, 1));
+            sprites.add(new WallSprite(7, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 13, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 14, 1, 1));
+            sprites.add(new WallSprite(7, 15, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 18, 1, 1));
+            sprites.add(new WallSprite(7, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(7, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 1, 1, 1));
+            sprites.add(new WallSprite(8, 2, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 3, 1, 1));
+            sprites.add(new WallSprite(8, 4, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 6, 1, 1));
+            sprites.add(new WallSprite(8, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 8, 1, 1));
+            sprites.add(new WallSprite(8, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 11, 1, 1));
+            sprites.add(new WallSprite(8, 12, 1, 1));
+            sprites.add(new WallSprite(8, 13, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 15, 1, 1));
+            sprites.add(new WallSprite(8, 16, 1, 1));
+            sprites.add(new WallSprite(8, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(8, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 0, 1, 1));
+            sprites.add(new WallSprite(9, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 2, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 4, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 5, 1, 1));
+            sprites.add(new WallSprite(9, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 7, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 9, 1, 1));
+            sprites.add(new WallSprite(9, 10, 1, 1));
+            sprites.add(new WallSprite(9, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 12, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 13, 1, 1));
+            sprites.add(new WallSprite(9, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 15, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 17, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 18, 1, 1));
+            sprites.add(new WallSprite(9, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(9, 20, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 0, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 1, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 2, 1, 1));
+            sprites.add(new WallSprite(10, 3, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 4, 1, 1));
+            sprites.add(new WallSprite(10, 5, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 6, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 7, 1, 1));
+            sprites.add(new WallSprite(10, 8, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 9, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 10, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 11, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 12, 1, 1));
+            sprites.add(new WallSprite(10, 13, 1, 1));
+            sprites.add(new WallSprite(10, 14, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 15, 1, 1));
+            sprites.add(new WallSprite(10, 16, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 17, 1, 1));
+            sprites.add(new WallSprite(10, 18, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 19, 1, 1));
+            sprites.add(new DisappearingWallSprite(10, 20, 1, 1));
+            //endregion
+
+            sprites.add(new WallSprite(0, -1, 11, 1));
+            sprites.add(new WallSprite(-1, 0, 1, 21));
+            sprites.add(new WallSprite(0, 21, 11, 1));
+            sprites.add(new WallSprite(11, 0, 1, 21));
+
+            return new GameState(c.getString(R.string.level_maze), new Point(11, 21), new PointF(0.25f, 0.25f), sprites);
         }
 
 
@@ -414,6 +663,8 @@ public class GameState {
                 return Level.Happy;
             case "Death Valley":
                 return Level.Death;
+            case "Maze":
+                return Level.Maze;
             default:
                 throw new IllegalArgumentException("Level not defined yet");
         }

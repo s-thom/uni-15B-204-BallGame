@@ -44,6 +44,7 @@
     <string name="level_happy">Happy Valley</string>
     <string name="level_death">Death Valley</string>
     <string name="level_scrolling">Scrolling</string>
+    <string name="level_maze">Maze</string>
     <string name="level_empty">Waiting</string>
     <string name="level_finished">Finished</string>
 </resources>
