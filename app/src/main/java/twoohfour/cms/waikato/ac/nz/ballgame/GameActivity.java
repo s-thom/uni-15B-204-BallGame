@@ -72,7 +72,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private NetThread _netThread;
 
-    private boolean _isHost;
+    private boolean _isMp;
 
     //endregion
 
@@ -101,10 +101,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             Log.e("GameActivity", "Couldn't hide action bar");
         }
 
-
-        // Messy code to get a GameState.Level from an int passed through the intent system
-        GameState.Level levelNum = GameState.Level.Empty;
-        _state = GameState.GENERATE(levelNum, this);
+        if (_isMp) {
+            // Messy code to get a GameState.Level from an int passed through the intent system
+            GameState.Level levelNum = GameState.Level.Empty;
+            _state = GameState.GENERATE(levelNum, this);
+        } else {
+            startLevel();
+        }
 
 
     }
@@ -183,7 +186,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Get sensitivity value
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String sensPref = sharedPref.getString(getResources().getString(R.string.key_pref_sensitivity), getResources().getString(R.string.pref_sensitivity_default_value));
-        _isHost = sharedPref.getBoolean(getResources().getString(R.string.key_pref_host), true);
+
+        _isMp = sharedPref.getBoolean(getResources().getString(R.string.key_pref_mp), true);
 
         debug = sharedPref.getBoolean(getResources().getString(R.string.key_pref_debug), false);
         if (debug)
