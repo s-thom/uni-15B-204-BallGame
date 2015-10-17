@@ -77,6 +77,10 @@ public class MultiplayerNetwork {
         _listeners.add(m);
     }
 
+    public void unregisterListener(MultiplayerEventListener m) {
+        _listeners.remove(m);
+    }
+
     public void sendCode(int code, String vars) {
         // Format it for data sending:
         // Format should be 3 digit code, plus any parameters (e.g a 300 hello)

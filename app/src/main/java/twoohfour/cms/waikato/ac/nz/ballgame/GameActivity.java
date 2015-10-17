@@ -24,6 +24,7 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.net.InetAddress;
@@ -43,6 +44,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public static final String EXTRA_LEVEL = "nz.ac.waikato.cms.twohofour.ballgame.LEVEL";
 
     private SensorManager sensorManager;
+    private MultiplayerNetwork _network;
     private Sensor accel;
     private boolean debug = false;
     private boolean debugButtons = false;
@@ -101,10 +103,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
 
 
-        _netThread = new NetThread();
-        _netThread.start();
-
-
         // Messy code to get a GameState.Level from an int passed through the intent system
         GameState.Level levelNum = GameState.Level.Empty;
         _state = GameState.GENERATE(levelNum, this);
@@ -154,6 +152,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }, 0, 1000 / UPDATES_PER_SECOND);
 
 
+        _netThread = new NetThread();
+        _netThread.start();
     }
 
     /**
@@ -166,9 +166,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Unregister accelerometer
         sensorManager.unregisterListener(this);
 
+        _network.unregisterListener(_netThread);
         _updateTimer.cancel();
+        _netThread.stopTimer();
+        _netThread = null;
 
-
+        finish();
     }
 
 
@@ -378,7 +381,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private class NetThread extends Thread implements MultiplayerEventListener {
 
-        private MultiplayerNetwork _network;
         private String _myIP;
         private InetAddress _myInet;
         private Timer _netTimer;
