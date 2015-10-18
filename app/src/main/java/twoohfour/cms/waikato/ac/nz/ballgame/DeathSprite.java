@@ -9,7 +9,7 @@ import android.graphics.RectF;
 /**
  * Created by Stuart on 11/10/2015.
  */
-public class DeathSprite extends GenericSprite {
+public class DeathSprite extends RectSprite {
     /**
      * Construct a DEATH sprite
      * @param leftPos How far away are we from the left wall
@@ -42,13 +42,5 @@ public class DeathSprite extends GenericSprite {
         canvas.drawRect(r, _paint);
 
     }
-
-    //region IBouncable methods
-    @Override
-    public boolean isCollidedWith(GenericSprite sprite) {
-        return super.isCollidedWith(sprite);
-    }
-
-
     //endregion
 }

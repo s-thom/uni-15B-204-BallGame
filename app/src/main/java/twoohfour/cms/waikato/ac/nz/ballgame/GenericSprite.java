@@ -114,6 +114,13 @@ public abstract class GenericSprite {
     }
 
     /**
+     * Returns how bouncy the sprite is
+     */
+    public float getBounciness() {
+        return 1;
+    }
+
+    /**
      * Sets the bounding rectangle of the sprite
      * @param r New bounding box
      */
@@ -248,30 +255,9 @@ public abstract class GenericSprite {
         _motion.y *= scaleF;
     }
 
-    /**
-     * Whether the sprite is collided with the given sprite
-     * @param sprite Sprite to check collision with
-     * @return Is collided?
-     */
-    public boolean isCollidedWith(GenericSprite sprite){
-        PointF sprMotion = sprite.getMotion();
-        RectF sprRect = sprite.getRectangle();
+    public abstract boolean intersects(GenericSprite sprite);
 
-        // Do a simple rectangle intersection check
-        if (RectF.intersects(_rect, sprRect) && !_rect.contains(sprRect))
-            // Ensure sprite is not heading away from this
-            if ((sprMotion.x < 0 && _rect.left < sprRect.right) ||
-                    (sprMotion.x > 0 && _rect.right > sprRect.left) ||
-                    (sprMotion.y < 0 && _rect.top < sprRect.bottom) ||
-                    (sprMotion.y > 0 && _rect.bottom > sprRect.top))
-                return true;
-            else
-                return false;
-        else
-            return false;
-
-
-    }
+    public abstract void reflect(GenericSprite sprite);
 
     /**
      * Draw the sprite at the given scale

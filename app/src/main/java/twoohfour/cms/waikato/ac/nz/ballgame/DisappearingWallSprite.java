@@ -9,7 +9,7 @@ import android.graphics.RectF;
 /**
  * Created by Stuart on 17/10/2015.
  */
-public class DisappearingWallSprite extends GenericSprite {
+public class DisappearingWallSprite extends RectSprite {
 
     protected Paint _border = new Paint();
 

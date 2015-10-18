@@ -8,7 +8,7 @@ import android.graphics.RectF;
 /**
  * Created by Stuart on 30/09/2015.
  */
-public class FinishSprite extends GenericSprite {
+public class FinishSprite extends RectSprite {
 
     public FinishSprite(float xPos, float yPos) {
         super(xPos, yPos);
@@ -33,7 +33,7 @@ public class FinishSprite extends GenericSprite {
     }
 
     @Override
-    public boolean isCollidedWith(GenericSprite sprite) {
+    public boolean intersects(GenericSprite sprite) {
         return _rect.contains(sprite.getRectangle());
     }
 }

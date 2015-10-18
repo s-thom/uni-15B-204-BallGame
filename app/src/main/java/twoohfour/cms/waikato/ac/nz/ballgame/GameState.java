@@ -213,21 +213,21 @@ public class GameState {
 
             for (GenericSprite t : _sprites) {
                 if (t != s) {
-                    if (t instanceof IBouncable && s instanceof ICollides && t.isCollidedWith(s)) {
+                    if (t instanceof ICollidable && s instanceof ICollides && t.intersects(s)) {
 
-                        ((IBouncable) t).bounceFrom(s);
+                        t.reflect(s);
 
                     } else if (t instanceof FinishSprite && s instanceof PlayerSprite) {
-                        if (t.isCollidedWith(s)) {
+                        if (t.intersects(s)) {
                             _state = State.Spectating;
                             addScore(1);
                         }
                     } else if (t instanceof DeathSprite && s instanceof PlayerSprite) {
-                        if (t.isCollidedWith(s)) {
+                        if (t.intersects(s)) {
                             _state = State.Spectating;
                         }
                     } else if (t instanceof DisappearingWallSprite && s instanceof PlayerSprite) {
-                        if (t.isCollidedWith(s)) {
+                        if (t.intersects(s)) {
                             toRemove.add(t);
                         }
                     }
