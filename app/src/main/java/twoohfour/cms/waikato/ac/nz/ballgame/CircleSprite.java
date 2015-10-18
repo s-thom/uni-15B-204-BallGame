@@ -43,8 +43,12 @@ public abstract class CircleSprite extends GenericSprite {
     @Override
     public boolean intersects(GenericSprite sprite) {
         float myRad = _rect.height() / 2;
+        RectF otherRect = sprite.getRectangle();
 
         if (sprite instanceof RectSprite){
+
+            PointF circleCentre = new PointF(_rect.centerX(), _rect.centerY());
+            float circleRadius = myRad;
 
             return sprite.getRectangle().intersects(_rect.left, _rect.top, _rect.right, _rect.bottom);
 
@@ -61,12 +65,10 @@ public abstract class CircleSprite extends GenericSprite {
 //
 //            return true;
         } else if (sprite instanceof CircleSprite){
-            RectF otherRect = sprite.getRectangle();
-            float otherRad = otherRect.height() / 2;
+            float distSq = (float)Math.pow(Math.abs(_rect.centerX() - otherRect.centerX()), 2) + (float)Math.pow(Math.abs(_rect.centerY() - otherRect.centerY()), 2);
+            float radSumSq = (float)Math.pow(myRad + (otherRect.height() / 2), 2);
 
-            float diff = (float)Math.abs(Math.sqrt(Math.pow(_rect.centerX() - otherRect.centerX(),2) + Math.pow(_rect.centerY() - otherRect.centerY(),2)));
-
-            return Math.abs(myRad - otherRad) > diff;
+            return distSq < radSumSq;
         } else
             throw new IllegalArgumentException("Sprites must extend a shaped sprite");
     }

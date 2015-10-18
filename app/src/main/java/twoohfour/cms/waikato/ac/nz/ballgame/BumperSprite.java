@@ -43,6 +43,10 @@ public class BumperSprite extends CircleSprite implements ICollidable {
 
     @Override
     public void reflect(GenericSprite sprite) {
+
+        if (_cooldown > 0)
+            return;
+
         PointF sprMotion = sprite.getMotion();
 
         float oldSpeed = (float)Math.sqrt(Math.pow(sprMotion.x, 2) + Math.pow(sprMotion.y, 2));
