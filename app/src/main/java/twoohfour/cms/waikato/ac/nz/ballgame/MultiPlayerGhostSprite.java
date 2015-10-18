@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by Tim on 11/10/2015.
  */
-public class MultiPlayerGhostSprite extends GenericSprite {
+public class MultiPlayerGhostSprite extends CircleSprite {
 
     boolean _ready = false;
 
@@ -70,11 +70,6 @@ public class MultiPlayerGhostSprite extends GenericSprite {
         // Update the player's motion
 
         super.update(state);
-    }
-
-    @Override
-    public boolean isCollidedWith(GenericSprite sprite) {
-        return false;
     }
 
 }

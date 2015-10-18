@@ -7,7 +7,7 @@ import android.graphics.PointF;
 /**
  * Created by Stuart on 30/09/2015.
  */
-public class BumperSprite extends GenericSprite implements IBouncable {
+public class BumperSprite extends CircleSprite implements ICollidable {
 
     private int _cooldown = 0;
 
@@ -42,20 +42,11 @@ public class BumperSprite extends GenericSprite implements IBouncable {
     }
 
     @Override
-    public boolean isCollidedWith(GenericSprite sprite) {
-        if (_cooldown == 0)
-            return super.isCollidedWith(sprite);
-        else
-            return false;
-    }
+    public void reflect(GenericSprite sprite) {
 
-    @Override
-    public float getBounciness() {
-        return 1;
-    }
+        if (_cooldown > 0)
+            return;
 
-    @Override
-    public void bounceFrom(GenericSprite sprite) {
         PointF sprMotion = sprite.getMotion();
 
         float oldSpeed = (float)Math.sqrt(Math.pow(sprMotion.x, 2) + Math.pow(sprMotion.y, 2));

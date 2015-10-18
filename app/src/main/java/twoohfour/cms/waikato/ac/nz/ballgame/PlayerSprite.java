@@ -11,7 +11,7 @@ import android.util.Log;
 /**
  * Created by Stuart on 25/09/2015.
  */
-public class PlayerSprite extends GenericSprite implements ICollides {
+public class PlayerSprite extends CircleSprite implements ICollides {
 
     public PlayerSprite(float x, float y) {
         this(x, y, 1);
@@ -45,10 +45,5 @@ public class PlayerSprite extends GenericSprite implements ICollides {
         addMotion(state.getGravity()[0], state.getGravity()[1]);
 
         super.update(state);
-    }
-
-    @Override
-    public boolean isCollidedWith(GenericSprite sprite) {
-        return super.isCollidedWith(sprite);
     }
 }

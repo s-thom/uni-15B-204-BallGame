@@ -9,7 +9,7 @@ import android.graphics.RectF;
 /**
  * Created by Tim Hampton on 25/09/2015.
  */
-public class WallSprite extends GenericSprite implements IBouncable {
+public class WallSprite extends RectSprite implements ICollidable {
 
     protected Paint _border = new Paint();
 
@@ -43,37 +43,4 @@ public class WallSprite extends GenericSprite implements IBouncable {
         canvas.drawRect(r, _border);
 
     }
-
-    //region IBouncable methods
-    @Override
-    public boolean isCollidedWith(GenericSprite sprite) {
-        return super.isCollidedWith(sprite);
-    }
-
-    @Override
-    public float getBounciness() {
-        return 1;
-    }
-
-    @Override
-    public void bounceFrom(GenericSprite sprite) {
-
-        RectF othrRect = sprite.getRectangle();
-        PointF othrMotion = sprite.getMotion();
-
-        boolean bounceX = ((othrRect.right > _rect.left && othrRect.left < _rect.left &&  othrMotion.x > 0) || (othrRect.left < _rect.right && othrRect.right > _rect.right && othrMotion.x < 0));
-        boolean bounceY = ((othrRect.bottom > _rect.top && othrRect.top < _rect.top && othrMotion.y > 0) || (othrRect.top < _rect.bottom && othrRect.bottom > _rect.bottom && othrMotion.y < 0));
-
-        // Each check here makes sure the player sprite is intersecting the right part of the given sprite
-        // This is a heck of a lot easier than the previous way I was doing it.
-        if (bounceX && bounceY) {
-            othrMotion.y *= -0.5f * getBounciness();
-            othrMotion.x *= -0.5f * getBounciness();
-        } else if (bounceY)
-            othrMotion.y *= -1 * getBounciness();
-        else if (bounceX)
-            othrMotion.x *= -1 * getBounciness();
-    }
-
-    //endregion
 }
